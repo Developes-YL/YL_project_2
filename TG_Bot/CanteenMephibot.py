@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import ValidationError
 
 class CanteenMephiBot(Bot):
     """доработанная версия класса Bot для чтения токена из файла и для его проверки"""
-    def __init__(self, file_name: str = 'token.txt'):
+    def __init__(self, file_name: str):
         try:
             with open(file_name, 'r') as f:
                 self.token = f.read()
