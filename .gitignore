@@ -1,4 +1,5 @@
 
 .idea
 *.pyc
-/Bots/token.txt
+Bot/TOKEN.txt
+WebAPI/Support/CODE.txt
