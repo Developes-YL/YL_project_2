@@ -1,10 +1,9 @@
 import sys
-
 import cv2
-import imutils
-from PyQt5 import uic  # Импортируем uic
+from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow, QApplication
+from imutils import resize
 from imutils.video import VideoStream
 from pyzbar import pyzbar
 
@@ -14,7 +13,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.previous_qr_code = ""
         self.camera_on = False
-        self.load_ui('main_window.ui')
+        self.load_ui('Support/main_window.ui')
         self.reset_status()
         self.start_camera()
 
@@ -56,7 +55,10 @@ class MainWindow(QMainWindow):
         return res
 
     def start_camera(self):
-        self.vs = VideoStream(src=0).start()
+        try:
+            self.vs = VideoStream(src=0).start()
+        except:
+            sys.exit()
         self.camera_on = True
         self.update()
 
@@ -70,18 +72,15 @@ class MainWindow(QMainWindow):
     def update_status(self, status, name, photo):
         self.about.setText(name)
         self.status.setText(status)
-        ...
 
     def reset_status(self):
         self.about.setText("")
         self.status.setText("")
         self.status_2.setText("")
-        ...
 
     def get_text_from_qr(self):
         frame = self.vs.read()
-        cv2.imshow("Barcode Scanner", frame)
-        frame = imutils.resize(frame, width=400)
+        frame = resize(frame, width=400)
         barcodes = pyzbar.decode(frame)
         if not barcodes:
             return None
@@ -96,7 +95,6 @@ class MainWindow(QMainWindow):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop_camera()
-        cv2.destroyAllWindows()
         super().__exit__(exc_type, exc_val, exc_tb)
 
 
