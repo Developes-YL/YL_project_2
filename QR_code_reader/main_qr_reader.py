@@ -1,11 +1,15 @@
 import sys
-import cv2
+
+import requests
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
 from pyzbar import pyzbar
+
+from QR_code_reader.Support.variables import CODE_FILE, HOST, PORT
 
 
 class MainWindow(QMainWindow):
@@ -14,11 +18,22 @@ class MainWindow(QMainWindow):
         self.previous_qr_code = ""
         self.camera_on = False
         self.load_ui('Support/main_window.ui')
+
         self.reset_status()
-        self.start_camera()
+        self.get_inf_from_bot("0", "")
+        # self.start_camera()
+
+    def set_new_photo(self, image: QPixmap):
+        pixmap = image.copy()
+        w_old, h_old = pixmap.width(), pixmap.height()
+        w_max, h_max = self.image.width(), self.image.height()
+        k = max(w_old / w_max, h_old / h_max)
+        pixmap = pixmap.scaled(int(w_old / k), int(h_old / k))
+        self.image.setPixmap(pixmap)
 
     def load_ui(self, file_name: str):
         uic.loadUi(file_name, self)
+        self.showMaximized()
 
     def update(self, delta: int = 100):
         QTimer.singleShot(delta, self.update)
@@ -67,11 +82,18 @@ class MainWindow(QMainWindow):
         self.vs.stop()
 
     def get_inf_from_bot(self, code, student_id):
-        return ["0"] * 3
+        with open(file="Support/CODE.txt", mode="r", encoding="utf-8") as f:
+            current_code = f.readline()
+        params = {"code": str(hash(current_code)),
+                  "id": student_id}
+        res = requests.get(f"http://{HOST}:{PORT}/get_photo", params=params).json()
+        self.width()
+        return [0, 0, res["photo"]]
 
     def update_status(self, status, name, photo):
         self.about.setText(name)
         self.status.setText(status)
+        self.set_new_photo(photo)
 
     def reset_status(self):
         self.about.setText("")
