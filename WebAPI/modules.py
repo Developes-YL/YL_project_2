@@ -1,6 +1,4 @@
-import hashlib
-
-from WebAPI.Support.variables import CODE_FILE
+from WebAPI.Support import CODE_FILE
 
 
 def get_inf_from_db(student_id: int) -> dict:

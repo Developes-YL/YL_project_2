@@ -1,7 +1,10 @@
+import json
+import imageio.v3 as iio
+import numpy as np
 from bottle import route, request, run
-from PyQt5.QtGui import QPixmap
+from PIL import Image
 
-from WebAPI.Support.variables import PORT, HOST
+from WebAPI import HOST, PORT
 from WebAPI.modules import get_inf_from_db, check_code
 
 
@@ -17,7 +20,7 @@ def get_information() -> dict:
 
 
 @route('/check')
-def get_information() -> dict:
+def check() -> dict:
     if not hasattr(request.query, "code"):
         return {"ok": False, "description": "неверный код"}
     code = request.query.code
@@ -25,13 +28,16 @@ def get_information() -> dict:
 
 
 @route('/photo')
-def get_information() -> dict:
+def get_photo() -> dict:
     if not hasattr(request.query, "code"):
         return {"ok": False, "description": "неверный код"}
     if not hasattr(request.query, "id"):
         return {"ok": False, "description": "неверный id"}
-    ans = {"ok": True, "photo": QPixmap("Support/bombs.png")}
-    return {"ok": True}
+    filename = "Support/bomb2.png"
+    image = Image.open(filename)
+    json_data = json.dumps(np.array(image).tolist())
+    ans = {"ok": True, "f": json_data}
+    return ans
 
 
 def main():
