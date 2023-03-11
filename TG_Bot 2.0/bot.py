@@ -1,6 +1,8 @@
 import telebot
 import random
 from telebot import types
+
+
 f = open('reg.txt', 'r', encoding='UTF-8')
 registration = f.read().split('\n')
 f.close()
@@ -22,13 +24,21 @@ def start(m, res=False):
                          reply_markup=markup)
 
 
+def f(m):
+    print(m.text)
+
+
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
-    if message.text.strip() == 'Зарегестрироваться' :
-            answer = random.choice(registration)
+    if message.text.strip() == 'Зарегестрироваться':
+        answer = random.choice(registration)
+        bot.send_message(message.chat.id, answer)
+        bot.register_next_step_handler(message, f)
     elif message.text.strip() == 'Получить QR':
-            answer = random.choice(giveQR)
-    bot.send_message(message.chat.id, answer)
+        answer = random.choice(giveQR)
+        bot.send_message(message.chat.id, answer)
+    else:
+        pass
 
 
 bot.infinity_polling()
