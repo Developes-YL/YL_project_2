@@ -6,7 +6,7 @@ def get_inf_from_db(student_id: int) -> dict:
 
 
 def get_status(for_lunch: bool, student_id: int, code: str) -> bool:
-    return [for_lunch, student_id, code]
+    return True
 
 
 def check_code(code: str) -> bool:

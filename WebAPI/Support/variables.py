@@ -2,9 +2,10 @@ import os.path
 
 
 def new_path(name: str) -> str:
+    print(os.path.abspath(name))
     return os.path.abspath(name)
 
 
-HOST = '192.168.0.101'
+HOST = 'localhost'
 PORT = 800
-CODE_FILE = new_path("CODE.txt")
+CODE_FILE = new_path("Support/CODE.txt")

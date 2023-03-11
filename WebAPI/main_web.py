@@ -1,7 +1,7 @@
 from bottle import route, request, run
 
 from WebAPI.Support.variables import PORT, HOST
-from WebAPI.modules import get_inf_from_db
+from WebAPI.modules import get_inf_from_db, check_code
 
 
 @route('/get_inf')
@@ -17,6 +17,16 @@ def get_information() -> dict:
 
 @route('/check')
 def get_information() -> dict:
+    if not hasattr(request.query, "code"):
+        return {"ok": False, "description": "неверный код"}
+    code = request.query.code
+    return {"ok": check_code(code)}
+
+
+@route('/photo')
+def get_information() -> dict:
+    if not hasattr(request.query, "code"):
+        return {"ok": False, "description": "неверный код"}
     if not hasattr(request.query, "code"):
         return {"ok": False, "description": "неверный код"}
     return {"ok": True}
