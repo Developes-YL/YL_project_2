@@ -2,6 +2,8 @@ import telebot
 import random
 from telebot import types
 
+data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович']
+all_forms = [8, 9, 10, 11]
 
 f = open('reg.txt', 'r', encoding='UTF-8')
 registration = f.read().split('\n')
@@ -24,16 +26,29 @@ def start(m, res=False):
                          reply_markup=markup)
 
 
-def f(m):
-    print(m.text)
+def f(message):
+    print(message.text)
+    if message.text in data_names:
+        bot.send_message(message.chat.id, 'Введите класс (через пробел):')
+        bot.register_next_step_handler(message, form)
+
+
+def form(message):
+    print(message.text)
+    message = message.text
+    if message[:2].isdigit() and int(message[0:2]) in all_forms:
+        bot.send_message(message.chat.id, 'Цифра класса введена верно')
+
+
 
 
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
     if message.text.strip() == 'Зарегестрироваться':
-        answer = random.choice(registration)
+        answer = "Введите ФИО"
         bot.send_message(message.chat.id, answer)
         bot.register_next_step_handler(message, f)
+
     elif message.text.strip() == 'Получить QR':
         answer = random.choice(giveQR)
         bot.send_message(message.chat.id, answer)
