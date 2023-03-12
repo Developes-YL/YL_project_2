@@ -1,15 +1,19 @@
 import sys
+from json import loads
 
-import requests
+from PIL import Image
+from PIL.ImageQt import ImageQt
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
+from numpy import array
 from pyzbar import pyzbar
 
-from QR_code_reader.Support.variables import CODE_FILE, HOST, PORT
+from QR_code_reader import UI_FILE
+from QR_code_reader.modules import get_inf_from_bot
 
 
 class MainWindow(QMainWindow):
@@ -17,14 +21,12 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.previous_qr_code = ""
         self.camera_on = False
-        self.load_ui('Support/main_window.ui')
+        self.load_ui(UI_FILE)
 
         self.reset_status()
-        self.get_inf_from_bot("0", "")
-        # self.start_camera()
+        self.start_camera()
 
-    def set_new_photo(self, image: QPixmap):
-        pixmap = image.copy()
+    def set_new_photo(self, pixmap: QPixmap):
         w_old, h_old = pixmap.width(), pixmap.height()
         w_max, h_max = self.image.width(), self.image.height()
         k = max(w_old / w_max, h_old / h_max)
@@ -66,8 +68,17 @@ class MainWindow(QMainWindow):
             return False
 
         code, student_id = words
-        res = self.get_inf_from_bot(code, student_id)
-        return res
+        res = get_inf_from_bot(code, student_id)
+        if res["ok"]:
+            img = Image.fromarray(array(loads(res["image"]), dtype='uint8'))
+            qim = ImageQt(img)
+            pix = QPixmap.fromImage(qim)
+            ans = str(res["status"]), res["name"] + "   " + res["grade"], pix
+            return ans
+        else:
+            self.reset_status()
+            self.status_2.setText(res["description"])
+            return ["", "", QPixmap()]
 
     def start_camera(self):
         try:
@@ -81,18 +92,9 @@ class MainWindow(QMainWindow):
         self.camera_on = False
         self.vs.stop()
 
-    def get_inf_from_bot(self, code, student_id):
-        with open(file="Support/CODE.txt", mode="r", encoding="utf-8") as f:
-            current_code = f.readline()
-        params = {"code": str(hash(current_code)),
-                  "id": student_id}
-        res = requests.get(f"http://{HOST}:{PORT}/get_photo", params=params).json()
-        self.width()
-        return [0, 0, res["photo"]]
-
     def update_status(self, status, name, photo):
         self.about.setText(name)
-        self.status.setText(status)
+        self.status_2.setText(status)
         self.set_new_photo(photo)
 
     def reset_status(self):

@@ -25,7 +25,9 @@ def get_information() -> dict:
     res = get_inf(student_id, student_code)
     if res:
         status, name, grade, photo = res
+        print({"ok": True, "status": status, "name": name, "grade": grade})
         return {"ok": True, "status": status, "name": name, "grade": grade, "image": photo}
+    print({"ok": False, "description": "ошибка во время получения информации из БД"})
     return {"ok": False, "description": "ошибка во время получения информации из БД"}
 
 
