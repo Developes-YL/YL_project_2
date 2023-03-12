@@ -18,7 +18,6 @@ except:
 if res["ok"]:
     if "image" in res.keys():
         data_1 = res["image"]
-        # data_1 = Image.fromarray(np.array(json.loads(img), dtype='uint8'))
         image = Image.open(PHOTOS_DIR + "/0.png")
         data_2 = json.dumps(array(image).tolist())
         if data_1 == data_2:

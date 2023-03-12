@@ -5,7 +5,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-from WebAPI import HOST, PORT, CODE_FILE, PHOTOS_DIR
+from WebAPI import HOST, PORT, CODE_FILE
 
 with open(file=CODE_FILE, mode="r", encoding="utf-8") as f:
     current_code = f.readline()

@@ -5,8 +5,7 @@ from json import dumps
 from PIL import Image
 from numpy import array
 
-from WebAPI import TIME_CHANGE, DB
-from WebAPI.Support import CODE_FILE, PHOTOS_DIR
+from WebAPI import TIME_CHANGE, DB, CODE_FILE, PHOTOS_DIR
 
 
 def get_inf(student_id: int, student_code: str) -> dict:
@@ -23,7 +22,6 @@ def load_inf_from_dp(student_id: int):
     cur = con.cursor()
     que = f'SELECT surname, name, patronymic, grade FROM Students WHERE id = {student_id}'
     result = cur.execute(que).fetchone()
-    print(result)
     name = ' '.join(result[:3])
     grade = result[3]
     con.close()
