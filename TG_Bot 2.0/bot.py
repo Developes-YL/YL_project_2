@@ -3,7 +3,8 @@ import random
 from telebot import types
 
 data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович']
-all_forms = [8, 9, 10, 11]
+all_forms = ['8', '9', '10', '11']
+all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
 
 f = open('reg.txt', 'r', encoding='UTF-8')
 registration = f.read().split('\n')
@@ -26,18 +27,26 @@ def start(m, res=False):
                          reply_markup=markup)
 
 
+
 def f(message):
-    print(message.text)
     if message.text in data_names:
         bot.send_message(message.chat.id, 'Введите класс (через пробел):')
         bot.register_next_step_handler(message, form)
+    else:
+        bot.send_message(message.chat.id, 'Ваше имя не найдено в базе данных! Попробуйте еще раз!')
+        bot.register_next_step_handler(message, f)
 
 
 def form(message):
-    print(message.text)
-    message = message.text
-    if message[:2].isdigit() and int(message[0:2]) in all_forms:
-        bot.send_message(message.chat.id, 'Цифра класса введена верно')
+    x = message.text
+    x = x.split(' ')
+    if x[0] in all_forms:
+        if x[1] in all_forms_letter:
+            bot.send_message(message.chat.id, 'Класс успешно определён!')
+    else:
+        bot.send_message(message.chat.id, 'Не можем определить ваш класс! Попробуйте еще раз! (Напоминание: введите букву класса в верхем регистре и на русской раскладке!)')
+        bot.register_next_step_handler(message, form)
+
 
 
 
@@ -46,7 +55,7 @@ def form(message):
 def handle_text(message):
     if message.text.strip() == 'Зарегестрироваться':
         answer = "Введите ФИО"
-        bot.send_message(message.chat.id, answer)
+        bot.send_message(message.chat.id, answer, reply_markup=types.ReplyKeyboardRemove())
         bot.register_next_step_handler(message, f)
 
     elif message.text.strip() == 'Получить QR':
