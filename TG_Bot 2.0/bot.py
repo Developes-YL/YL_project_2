@@ -1,6 +1,9 @@
 import telebot
 import random
 from telebot import types
+import os
+
+path = r"my/path/to/file.txt"
 
 data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович']
 all_forms = ['8', '9', '10', '11']
@@ -43,13 +46,29 @@ def form(message):
     if x[0] in all_forms:
         if x[1] in all_forms_letter:
             bot.send_message(message.chat.id, 'Класс успешно определён!')
+            bot.send_message(message.chat.id, 'Отправьте ваше фото :)')
+            bot.register_next_step_handler(message, handle_docs_photo)
     else:
         bot.send_message(message.chat.id, 'Не можем определить ваш класс! Попробуйте еще раз! (Напоминание: введите букву класса в верхем регистре и на русской раскладке!)')
         bot.register_next_step_handler(message, form)
 
 
+def handle_docs_photo(message):
+    from pathlib import Path
+    Path(f'files/{message.chat.id}/').mkdir(parents=True, exist_ok=True)
+    if message.content_type == 'photo':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        src = f'files/{message.chat.id}/' + file_info.file_path.replace('photos/', '')
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
 
-
+    elif message.content_type == 'document':
+        file_info = bot.get_file(message.document.file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        src = f'files/{message.chat.id}/' + message.document.file_name
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
 
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
