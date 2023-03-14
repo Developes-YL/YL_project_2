@@ -1,7 +1,9 @@
+import sqlite3
+
 import telebot
 import random
 from telebot import types
-import os
+
 
 path = r"my/path/to/file.txt"
 
@@ -32,13 +34,49 @@ def start(m, res=False):
 
 
 def f(message):
-    if message.text in data_names:
-        bot.send_message(message.chat.id, 'Введите класс (через пробел):')
-        bot.register_next_step_handler(message, form)
+    name_lst = message.text.split(' ')
+    if True: # message.text in data_names:
+        if len(name_lst) in [2, 3]:
+            flag = True
+            for i in range(len(name_lst)):
+                if not name_lst[i].isalpha() or len(name_lst[i]) < 2:
+                    bot.send_message(message.chat.id, 'Ваше имя содержит цифры или слишком короткое, попробуйте еще раз!')
+                    bot.register_next_step_handler(message, f)
+                    flag = False
+                    break
+            if flag:
+                bot.send_message(message.chat.id, 'Введите класс (через пробел):')
+                bot.register_next_step_handler(message, form)
+        else:
+            bot.send_message(message.chat.id, 'Ваше имя должно состоять из 3 слов!')
+            bot.register_next_step_handler(message, f)
     else:
         bot.send_message(message.chat.id, 'Ваше имя не найдено в базе данных! Попробуйте еще раз!')
         bot.register_next_step_handler(message, f)
 
+# добавить!!!
+#res = add_to_db(name, grade, tg_id, photo)if res["OK"]:
+   # bot.send_message(m.chat.id, "Все успешно")else:
+    #bot.send_message(m.chat.id, "Что-то пошло не так :(")    bot.send_message(m.chat.id, res["description"])
+
+
+def add_to_db(name, grade, tg_id, photo):
+    inf_to_check = f"{name} {grade} {tg_id}"
+    con = sqlite3.connect("../DB/MainDB.db")
+    cur = con.cursor()
+    que = "SELECT name, surname, patronymic, grade, tg_id FROM Students"
+    res = cur.execute(que).fetchall()
+    name_in_db = False
+    for elem in res:
+        inf = ' '.join(map(str, elem))
+        if inf_to_check == inf:
+            name_in_db = True
+            break
+    if name_in_db:
+        ans = {"OK": False, "description": "ваше имя уже есть в DB"}
+    else:
+        ans = {"OK": True}
+    return ans
 
 def form(message):
     x = message.text
@@ -51,6 +89,7 @@ def form(message):
     else:
         bot.send_message(message.chat.id, 'Не можем определить ваш класс! Попробуйте еще раз! (Напоминание: введите букву класса в верхем регистре и на русской раскладке!)')
         bot.register_next_step_handler(message, form)
+
 
 
 def handle_docs_photo(message):
