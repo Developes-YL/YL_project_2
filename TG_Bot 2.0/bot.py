@@ -109,6 +109,42 @@ def handle_docs_photo(message):
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
 
+    bot.send_message(message.chat.id, 'Фото успешно сохранено')
+    bot.send_message(message.chat.id, 'Выберите дни пользования столовой')
+    bot.register_next_step_handler(message, choise_day)
+
+
+def choise_day(message, res=False):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Понедельник")
+    item2 = types.KeyboardButton("Вторник")
+    item3 = types.KeyboardButton("Среда")
+    item4 = types.KeyboardButton("Четверг")
+    item5 = types.KeyboardButton("Пятница")
+    item6 = types.KeyboardButton("Суббота")
+    markup.add(item1)
+    markup.add(item2)
+    markup.add(item3)
+    markup.add(item4)
+    markup.add(item5)
+    markup.add(item6)
+    bot.register_next_step_handler(message, choise_day_finish, reply_markup=markup)
+
+
+def choise_day_finish(message):
+    if message.text.strip() == "Понедельник":
+        bot.send_message(message.chat.id, 'Завтрак или обед?')
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+
+
+
+
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
     if message.text.strip() == 'Зарегестрироваться':
