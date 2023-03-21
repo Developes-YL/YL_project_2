@@ -82,10 +82,13 @@ def form(message):
     x = message.text
     x = x.split(' ')
     if x[0] in all_forms:
-        if x[1] in all_forms_letter:
+        if x[1].upper() in all_forms_letter:
             bot.send_message(message.chat.id, 'Класс успешно определён!')
             bot.send_message(message.chat.id, 'Отправьте ваше фото :)')
             bot.register_next_step_handler(message, handle_docs_photo)
+        else:
+            bot.send_message(message.chat.id, 'Не можем определить ваш класс! Попробуйте еще раз! (Напоминание: введите букву класса в верхем регистре и на русской раскладке!)')
+            bot.register_next_step_handler(message, form)
     else:
         bot.send_message(message.chat.id, 'Не можем определить ваш класс! Попробуйте еще раз! (Напоминание: введите букву класса в верхем регистре и на русской раскладке!)')
         bot.register_next_step_handler(message, form)
@@ -110,11 +113,7 @@ def handle_docs_photo(message):
             new_file.write(downloaded_file)
 
     bot.send_message(message.chat.id, 'Фото успешно сохранено')
-    bot.send_message(message.chat.id, 'Выберите дни пользования столовой')
-    bot.register_next_step_handler(message, choise_day)
-
-
-def choise_day(message, res=False):
+    
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton("Понедельник")
     item2 = types.KeyboardButton("Вторник")
@@ -128,12 +127,12 @@ def choise_day(message, res=False):
     markup.add(item4)
     markup.add(item5)
     markup.add(item6)
-    bot.register_next_step_handler(message, choise_day_finish, reply_markup=markup)
+    bot.send_message(message.chat.id, 'Выберите дни пользования столовой', reply_markup=markup)
+    bot.register_next_step_handler(message, choise_day_finish)
 
 
 def choise_day_finish(message):
     if message.text.strip() == "Понедельник":
-        bot.send_message(message.chat.id, 'Завтрак или обед?')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         item1 = types.KeyboardButton("Завтрак")
         item2 = types.KeyboardButton("Обед")
@@ -141,6 +140,7 @@ def choise_day_finish(message):
         markup.add(item1)
         markup.add(item2)
         markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
 
 
 
