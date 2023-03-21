@@ -10,6 +10,7 @@ path = r"my/path/to/file.txt"
 data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович']
 all_forms = ['8', '9', '10', '11']
 all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
+db = {}
 
 f = open('reg.txt', 'r', encoding='UTF-8')
 registration = f.read().split('\n')
@@ -112,7 +113,14 @@ def handle_docs_photo(message):
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
 
-    bot.send_message(message.chat.id, 'Фото успешно сохранено')
+    bot.register_next_step_handler(message, choise_day)
+    bot.send_message(message.chat.id, 'Фото успешно сохранено', reply_markup=text)
+
+
+# ВОТ ЭТОТ КЛАСС СНИЗУ ОБЯЗАТЕЛЬНО ДОЛЖЕН БЫТЬ ОТЕЛЬНО, Я К НИМУ ДОЛЖЕН БУДУ ПОСТОЯННО ОБРАЩЯТСЯ! ТЕРБУЮ ФИКС
+# ОН ОЖИДАЕТ СООБЩЕНИЯ, В ИНЕТЕ ФУНКЦИЮ ЧТО БЫ СРАЗУ ПЕРЕХОДИТЬ НА ДРУГОЙ КЛАСС Я НЕ НАШЕЛ! НУЖЕН ХОТФИКС! СРОЧНО!!!!!
+
+def choise_day(message):
     
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton("Понедельник")
@@ -133,6 +141,7 @@ def handle_docs_photo(message):
 
 def choise_day_finish(message):
     if message.text.strip() == "Понедельник":
+        x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         item1 = types.KeyboardButton("Завтрак")
         item2 = types.KeyboardButton("Обед")
@@ -141,6 +150,31 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+
+def add_day_to_db(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Понедельник,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак')
+        bot.send_message(message.chat.id, 'Для подтверждения введите слово "Да"')
+        bot.register_next_step_handler(message, confirmation)
+
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Понедельник,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Понедельник - Обед')
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Понедельник,Завтрак,обед'
+        bot.register_next_step_handler(message, choise_day)
+        bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак и обед')
+    print(db)
+
+
+
+def confirmation(message):
+    if message.text.strip() == 'Да':
+        pass
+
+
 
 
 
