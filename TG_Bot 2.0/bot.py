@@ -7,11 +7,11 @@ from telebot import types
 
 path = r"my/path/to/file.txt"
 
-data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович']
+data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович', 'Волков Александр Алексеевич']
 all_forms = ['8', '9', '10', '11']
 all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
 db = {}
-
+data_db = []
 f = open('reg.txt', 'r', encoding='UTF-8')
 registration = f.read().split('\n')
 f.close()
@@ -120,28 +120,24 @@ def handle_docs_photo(message):
 
 def choise_day(message):
 
-    if len(db) > 0:
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1 = types.KeyboardButton("Понедельник")
-        item2 = types.KeyboardButton("Вторник")
-        item3 = types.KeyboardButton("Среда")
-        item4 = types.KeyboardButton("Четверг")
-        item5 = types.KeyboardButton("Пятница")
-        item6 = types.KeyboardButton("Суббота")
-        item7 = types.KeyboardButton("Далее")
-        markup.add(item1)
-        markup.add(item2)
-        markup.add(item3)
-        markup.add(item4)
-        markup.add(item5)
-        markup.add(item6)
-        markup.add(item7)
-        bot.send_message(message.chat.id, 'Выберите дни пользования столовой', reply_markup=markup)
-        bot.register_next_step_handler(message, choise_day_finish)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Понедельник")
+    item2 = types.KeyboardButton("Вторник")
+    item3 = types.KeyboardButton("Среда")
+    item4 = types.KeyboardButton("Четверг")
+    item5 = types.KeyboardButton("Пятница")
+    item6 = types.KeyboardButton("Суббота")
+    item7 = types.KeyboardButton("Далее")
+    markup.add(item1)
+    markup.add(item2)
+    markup.add(item3)
+    markup.add(item4)
+    markup.add(item5)
+    markup.add(item6)
+    markup.add(item7)
+    bot.send_message(message.chat.id, 'Выберите дни пользования столовой', reply_markup=markup)
+    bot.register_next_step_handler(message, choise_day_finish)
 
-    else:
-        bot.send_message(message.chat.id, 'Вы не выюрали ни одного дня(')
-        choise_day(message)
 
 
 def choise_day_finish(message):
@@ -155,7 +151,7 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db1)
     elif message.text.strip() == "Вторник":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -166,7 +162,7 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db2)
     elif message.text.strip() == "Среда":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -177,7 +173,7 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db3)
     elif message.text.strip() == "Четверг":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -188,7 +184,7 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db4)
     elif message.text.strip() == "Пятница":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -199,7 +195,7 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db5)
     elif message.text.strip() == "Суббота":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -210,15 +206,22 @@ def choise_day_finish(message):
         markup.add(item2)
         markup.add(item3)
         bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
-        bot.register_next_step_handler(message, add_day_to_db)
+        bot.register_next_step_handler(message, add_day_to_db6)
+    elif message.text.strip() == "Далее":
+        if len(db) > 0:
+            bot.send_message(message.chat.id, db)
+        else:
+            bot.send_message(message.chat.id, 'Вы ничего не выбрали')
+            choise_day(message)
 
-def add_day_to_db(message):
+
+def add_day_to_db1(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Понедельник,Завтрак'
+        data_db.append([message.chat.id] + ' = Понедельник,Завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак')
         choise_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Понедельник,Обед'
+        data_db.append([message.chat.id] + ' = Понедельник,Обед')
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Обед')
         choise_day(message)
     elif message.text.strip() == 'И завтрак и обед':
@@ -227,8 +230,80 @@ def add_day_to_db(message):
         choise_day(message)
     print(db)
 
+def add_day_to_db2(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Вторник,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Вторник - Завтрак')
+        choise_day(message)
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Вторник,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Вторник - Обед')
+        choise_day(message)
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Вторник,Завтрак,обед'
+        bot.send_message(message.chat.id, 'Добавлено: Вторник - Завтрак и обед')
+        choise_day(message)
+    print(db)
 
+def add_day_to_db3(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Среда,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Среда - Завтрак')
+        choise_day(message)
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Среда,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Среда - Обед')
+        choise_day(message)
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Среда,Завтрак,обед'
+        bot.send_message(message.chat.id, 'Добавлено: Среда - Завтрак и обед')
+        choise_day(message)
+    print(db)
 
+def add_day_to_db4(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Четверг,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Четверг - Завтрак')
+        choise_day(message)
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Четверг,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Четверг - Обед')
+        choise_day(message)
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Четверг,Завтрак,обед'
+        bot.send_message(message.chat.id, 'Добавлено: Четверг - Завтрак и обед')
+        choise_day(message)
+    print(db)
+
+def add_day_to_db5(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Пятница,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Пятница - Завтрак')
+        choise_day(message)
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Пятница,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Пятница - Обед')
+        choise_day(message)
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Пятница,Завтрак,обед'
+        bot.send_message(message.chat.id, 'Добавлено: Пятница - Завтрак и обед')
+        choise_day(message)
+    print(db)
+
+def add_day_to_db6(message):
+    if message.text.strip() == 'Завтрак':
+        db[message.chat.id] = 'Суббота,Завтрак'
+        bot.send_message(message.chat.id, 'Добавлено: Суббота - Завтрак')
+        choise_day(message)
+    elif message.text.strip() == 'Обед':
+        db[message.chat.id] = 'Суббота,Обед'
+        bot.send_message(message.chat.id, 'Добавлено: Суббота - Обед')
+        choise_day(message)
+    elif message.text.strip() == 'И завтрак и обед':
+        db[message.chat.id] = 'Суббота,Завтрак,обед'
+        bot.send_message(message.chat.id, 'Добавлено: Суббота - Завтрак и обед')
+        choise_day(message)
+    print(db)
 
 
 
