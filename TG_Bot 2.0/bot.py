@@ -113,34 +113,94 @@ def handle_docs_photo(message):
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
 
-    bot.register_next_step_handler(message, choise_day)
-    bot.send_message(message.chat.id, 'Фото успешно сохранено', reply_markup=text)
+    bot.send_message(message.chat.id, 'Фото успешно сохранено')
+    choise_day(message)
 
 
-# ВОТ ЭТОТ КЛАСС СНИЗУ ОБЯЗАТЕЛЬНО ДОЛЖЕН БЫТЬ ОТЕЛЬНО, Я К НИМУ ДОЛЖЕН БУДУ ПОСТОЯННО ОБРАЩЯТСЯ! ТЕРБУЮ ФИКС
-# ОН ОЖИДАЕТ СООБЩЕНИЯ, В ИНЕТЕ ФУНКЦИЮ ЧТО БЫ СРАЗУ ПЕРЕХОДИТЬ НА ДРУГОЙ КЛАСС Я НЕ НАШЕЛ! НУЖЕН ХОТФИКС! СРОЧНО!!!!!
 
 def choise_day(message):
-    
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item1 = types.KeyboardButton("Понедельник")
-    item2 = types.KeyboardButton("Вторник")
-    item3 = types.KeyboardButton("Среда")
-    item4 = types.KeyboardButton("Четверг")
-    item5 = types.KeyboardButton("Пятница")
-    item6 = types.KeyboardButton("Суббота")
-    markup.add(item1)
-    markup.add(item2)
-    markup.add(item3)
-    markup.add(item4)
-    markup.add(item5)
-    markup.add(item6)
-    bot.send_message(message.chat.id, 'Выберите дни пользования столовой', reply_markup=markup)
-    bot.register_next_step_handler(message, choise_day_finish)
+
+    if len(db) > 0:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Понедельник")
+        item2 = types.KeyboardButton("Вторник")
+        item3 = types.KeyboardButton("Среда")
+        item4 = types.KeyboardButton("Четверг")
+        item5 = types.KeyboardButton("Пятница")
+        item6 = types.KeyboardButton("Суббота")
+        item7 = types.KeyboardButton("Далее")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        markup.add(item4)
+        markup.add(item5)
+        markup.add(item6)
+        markup.add(item7)
+        bot.send_message(message.chat.id, 'Выберите дни пользования столовой', reply_markup=markup)
+        bot.register_next_step_handler(message, choise_day_finish)
+
+    else:
+        bot.send_message(message.chat.id, 'Вы не выюрали ни одного дня(')
+        choise_day(message)
 
 
 def choise_day_finish(message):
     if message.text.strip() == "Понедельник":
+        x = message.text.strip()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+    elif message.text.strip() == "Вторник":
+        x = message.text.strip()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+    elif message.text.strip() == "Среда":
+        x = message.text.strip()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+    elif message.text.strip() == "Четверг":
+        x = message.text.strip()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+    elif message.text.strip() == "Пятница":
+        x = message.text.strip()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1 = types.KeyboardButton("Завтрак")
+        item2 = types.KeyboardButton("Обед")
+        item3 = types.KeyboardButton("И завтрак и обед")
+        markup.add(item1)
+        markup.add(item2)
+        markup.add(item3)
+        bot.send_message(message.chat.id, 'Завтрак или обед?', reply_markup=markup)
+        bot.register_next_step_handler(message, add_day_to_db)
+    elif message.text.strip() == "Суббота":
         x = message.text.strip()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         item1 = types.KeyboardButton("Завтрак")
@@ -156,23 +216,18 @@ def add_day_to_db(message):
     if message.text.strip() == 'Завтрак':
         db[message.chat.id] = 'Понедельник,Завтрак'
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак')
-        bot.send_message(message.chat.id, 'Для подтверждения введите слово "Да"')
-        bot.register_next_step_handler(message, confirmation)
-
+        choise_day(message)
     elif message.text.strip() == 'Обед':
         db[message.chat.id] = 'Понедельник,Обед'
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Обед')
+        choise_day(message)
     elif message.text.strip() == 'И завтрак и обед':
         db[message.chat.id] = 'Понедельник,Завтрак,обед'
-        bot.register_next_step_handler(message, choise_day)
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак и обед')
+        choise_day(message)
     print(db)
 
 
-
-def confirmation(message):
-    if message.text.strip() == 'Да':
-        pass
 
 
 
