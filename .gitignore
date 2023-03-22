@@ -3,3 +3,4 @@
 *.pyc
 Bot/TOKEN.txt
 WebAPI/Support/CODE.txt
+venv
