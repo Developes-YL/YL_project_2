@@ -1,0 +1,8 @@
+price_this_month_breakfast=1
+price_next_month_breakfast=1
+price_this_month_lunch=1
+price_next_month_lunch=1
+time_start=8:00
+time_change=11:00
+time_stop=15:00
+time_generation=6:00
