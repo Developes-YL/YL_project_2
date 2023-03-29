@@ -32,21 +32,24 @@
      <x>60</x>
      <y>40</y>
      <width>291</width>
-     <height>81</height>
+     <height>176</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTextEdit" name="textEdit">
-      <property name="placeholderText">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="text">
        <string>login</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QTextEdit" name="textEdit_2">
-      <property name="placeholderText">
-       <string>password</string>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="text">
+       <string>paswword</string>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
       </property>
      </widget>
     </item>

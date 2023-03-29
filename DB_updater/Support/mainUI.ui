@@ -38,14 +38,7 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTableView" name="tableView"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>обновить</string>
-       </property>
-      </widget>
+      <widget class="QTableWidget" name="tableWidget"/>
      </item>
     </layout>
    </widget>
@@ -65,22 +58,33 @@
         <widget class="QSpinBox" name="spinBox"/>
        </item>
        <item>
-        <widget class="QRadioButton" name="radioButton">
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="font">
+          <font>
+           <stylestrategy>PreferDefault</stylestrategy>
+          </font>
+         </property>
          <property name="text">
-          <string/>
+          <string>Удалить</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>Принять</string>
-       </property>
-      </widget>
-     </item>
     </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>990</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Подтвердить изменения</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

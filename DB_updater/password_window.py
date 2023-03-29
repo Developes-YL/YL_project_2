@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5 import uic
 
-from DB_updater import change_window
+from YL_project_2.DB_updater import change_window
 from mainwindow import MyWindow
 
 
@@ -13,9 +13,9 @@ class MyWindow2(QDialog):
         self.checked = 0
 
     def check(self):
-        login = self.textEdit.toPlainText()
-        password = self.textEdit_2.toPlainText()
-        self.textEdit_2.setText("")
+        login = self.lineEdit.text()
+        password = self.lineEdit_2.text()
+        self.lineEdit_2.setText("")
         with open("Support/passwords.txt", "r") as f:
             passwords = dict()
             lines = f.readlines()
