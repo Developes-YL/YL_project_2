@@ -8,8 +8,8 @@ from modules_for_db import is_user_in_db, get_name_from_db, add_inf_to_db
 data_names = ['Пушкин Руслан Сергеевич', 'Панов Александр Максимович', 'Волков Александр Алексеевич']
 all_forms = ['8', '9', '10', '11']
 all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
-db = {}
-data_db = []
+db = []
+
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -68,6 +68,7 @@ def handle_name(message: Message):
 def handle_grade(message: Message, inf: dict):
     grade_number, grade_letter = message.text.split()
     if grade_number in all_forms:
+        res = message.text.split()
         if grade_letter.upper() in all_forms_letter:
             answer = 'Класс успешно определён!\nОтправьте ваше фото :)'
             inf["grade_letter"] = grade_letter
@@ -77,6 +78,7 @@ def handle_grade(message: Message, inf: dict):
             answer = 'Не можем определить ваш класс! Попробуйте еще раз!\n ' \
                      'Напоминание: введите букву класса на русской раскладке!'
             next_function = (lambda x: handle_grade(x, inf))
+            handle_text()
     else:
         answer = 'Не можем определить ваш класс! Попробуйте еще раз!\n ' \
                  'Напоминание: введите букву класса на русской раскладке!'
@@ -200,7 +202,14 @@ def choice_day_finish(message):
         bot.register_next_step_handler(message, add_day_to_db6)
     elif message.text.strip() == "Далее":
         if len(db) > 0:
-            bot.send_message(message.chat.id, db)
+            for i in range(len(db)):
+                if str(message.chat.id) in db[i]:
+                    n = db[i]
+                    n = n.split('-')
+                    n = n[1:]
+                    for j in range(len(n)):
+                        bot.send_message(message.chat.id, 'Вы выбрали:' + n[j])
+
         else:
             bot.send_message(message.chat.id, 'Вы ничего не выбрали')
             choice_day(message)
@@ -208,15 +217,15 @@ def choice_day_finish(message):
 
 def add_day_to_db1(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Понедельник,Завтрак'
+        db.append(str(message.chat.id) + '-понедельник-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Понедельник,Обед'
-        bot.send_message(message.chat.id, 'Добавлено: Понедельник - Обед')
+        db.append(str(message.chat.id) + '-понедельник-обед')
+        bot.send_message(message.chat.id, 'Добавлено: Понедельник - обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Понедельник,Завтрак,обед'
+        db.append(str(message.chat.id) + '-понедельник-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Понедельник - Завтрак и обед')
         choice_day(message)
     print(db)
@@ -224,15 +233,15 @@ def add_day_to_db1(message):
 
 def add_day_to_db2(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Вторник,Завтрак'
+        db.append(str(message.chat.id) + '-вторник-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Вторник - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Вторник,Обед'
+        db.append(str(message.chat.id) + '-вторник-обед')
         bot.send_message(message.chat.id, 'Добавлено: Вторник - Обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Вторник,Завтрак,обед'
+        db.append(str(message.chat.id) + '-вторник-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Вторник - Завтрак и обед')
         choice_day(message)
     print(db)
@@ -240,15 +249,15 @@ def add_day_to_db2(message):
 
 def add_day_to_db3(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Среда,Завтрак'
+        db.append(str(message.chat.id) + '-среда-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Среда - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Среда,Обед'
+        db.append(str(message.chat.id) + '-среда-обед')
         bot.send_message(message.chat.id, 'Добавлено: Среда - Обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Среда,Завтрак,обед'
+        db.append(str(message.chat.id) + '-среда-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Среда - Завтрак и обед')
         choice_day(message)
     print(db)
@@ -256,15 +265,15 @@ def add_day_to_db3(message):
 
 def add_day_to_db4(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Четверг,Завтрак'
+        db.append(str(message.chat.id) + '-четверг-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Четверг - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Четверг,Обед'
+        db.append(str(message.chat.id) + '-четверг-обед')
         bot.send_message(message.chat.id, 'Добавлено: Четверг - Обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Четверг,Завтрак,обед'
+        db.append(str(message.chat.id) + '-четверг-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Четверг - Завтрак и обед')
         choice_day(message)
     print(db)
@@ -272,15 +281,15 @@ def add_day_to_db4(message):
 
 def add_day_to_db5(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Пятница,Завтрак'
+        db.append(str(message.chat.id) + '-пятница-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Пятница - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Пятница,Обед'
+        db.append(str(message.chat.id) + '-пятница-обед')
         bot.send_message(message.chat.id, 'Добавлено: Пятница - Обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Пятница,Завтрак,обед'
+        db.append(str(message.chat.id) + '-пятница-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Пятница - Завтрак и обед')
         choice_day(message)
     print(db)
@@ -288,15 +297,15 @@ def add_day_to_db5(message):
 
 def add_day_to_db6(message):
     if message.text.strip() == 'Завтрак':
-        db[message.chat.id] = 'Суббота,Завтрак'
+        db.append(str(message.chat.id) + '-суббота-завтрак')
         bot.send_message(message.chat.id, 'Добавлено: Суббота - Завтрак')
         choice_day(message)
     elif message.text.strip() == 'Обед':
-        db[message.chat.id] = 'Суббота,Обед'
+        db.append(str(message.chat.id) + '-суббота-обед')
         bot.send_message(message.chat.id, 'Добавлено: Суббота - Обед')
         choice_day(message)
     elif message.text.strip() == 'И завтрак и обед':
-        db[message.chat.id] = 'Суббота,Завтрак,обед'
+        db.append(str(message.chat.id) + '-суббота-завтрак-обед')
         bot.send_message(message.chat.id, 'Добавлено: Суббота - Завтрак и обед')
         choice_day(message)
     print(db)
