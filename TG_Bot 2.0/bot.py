@@ -9,7 +9,7 @@ data_names = ['Пушкин Руслан Сергеевич', 'Панов Але
 all_forms = ['8', '9', '10', '11']
 all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
 db = []
-
+db1 = []
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -209,10 +209,32 @@ def choice_day_finish(message):
                     n = n[1:]
                     for j in range(len(n)):
                         bot.send_message(message.chat.id, 'Вы выбрали:' + n[j])
+            pay_bot(message)
 
         else:
             bot.send_message(message.chat.id, 'Вы ничего не выбрали')
             choice_day(message)
+
+
+def pay_bot(message):
+    brekfast = 0
+    lunch = 0
+    for i in range(len(db)):
+        x = db.find(message.chat.id)
+        db_1.append(x)
+    for j in range(len(db1)):
+        if 'завтрак' in db[j]:
+            brekfast += 1
+        if 'обед' in db[j]:
+            lunch += 1
+    brekfast_final_cost = brekfast_cost * brekfast
+    lunch_final_cost = lunch_cost * lunch
+    bot.send_message(message.chat.id, 'Стоимость Завтраков:' + brekfast_final_cost)
+    bot.send_message(message.chat.id, 'Стоимость Обедов:' + lunch_final_cost)
+    bot.send_message(message.chat.id, 'Общая стоимость:' + (brekfast_final_cost + lunch_final_cost))
+    bot.send_message(message.chat.id, 'Что бы оплатить обед, переведите ' + (brekfast_final_cost + lunch_final_cost) +
+                                      'на QIWI кошелек по номеру +79253503525')
+
 
 
 def add_day_to_db1(message):
