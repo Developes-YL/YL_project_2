@@ -10,7 +10,8 @@ all_forms = ['8', '9', '10', '11']
 all_forms_letter = ['О', 'М', 'Н', 'П', 'Р']
 db = []
 db1 = []
-
+brekfast_cost = 185
+lunch_cost = 348
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
 bot = telebot.TeleBot(token)
@@ -219,21 +220,24 @@ def choice_day_finish(message):
 def pay_bot(message):
     brekfast = 0
     lunch = 0
+    db_1 = []
+    brekfast_cost = 185
+    lunch_cost = 348
     for i in range(len(db)):
-        x = db.find(message.chat.id)
-        db_1.append(x)
-    for j in range(len(db1)):
-        if 'завтрак' in db[j]:
+        if str(message.chat.id) in db[i]:
+            db_1.append(db[i])
+    for j in range(len(db_1)):
+        if 'завтрак' in db_1[j]:
             brekfast += 1
-        if 'обед' in db[j]:
+        if 'обед' in db_1[j]:
             lunch += 1
     brekfast_final_cost = brekfast_cost * brekfast
     lunch_final_cost = lunch_cost * lunch
-    bot.send_message(message.chat.id, 'Стоимость Завтраков:' + brekfast_final_cost)
-    bot.send_message(message.chat.id, 'Стоимость Обедов:' + lunch_final_cost)
-    bot.send_message(message.chat.id, 'Общая стоимость:' + (brekfast_final_cost + lunch_final_cost))
-    bot.send_message(message.chat.id, 'Что бы оплатить обед, переведите ' + (brekfast_final_cost + lunch_final_cost) +
-                                      'на QIWI кошелек по номеру +79253503525')
+    bot.send_message(message.chat.id, 'Стоимость Завтраков:' + str(brekfast_final_cost))
+    bot.send_message(message.chat.id, 'Стоимость Обедов:' + str(lunch_final_cost))
+    bot.send_message(message.chat.id, 'Общая стоимость:' + str((brekfast_final_cost + lunch_final_cost)))
+    bot.send_message(message.chat.id, 'Что бы оплатить обед, переведите ' + str((brekfast_final_cost + lunch_final_cost)) +
+                                      ' на QIWI кошелек по номеру +79253503525')
 
 
 
