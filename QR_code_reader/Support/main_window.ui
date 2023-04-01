@@ -17,19 +17,9 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>QR code reader</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QOpenGLWidget" name="ogw">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>561</width>
-      <height>431</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="about">
     <property name="geometry">
      <rect>
@@ -46,10 +36,10 @@
    <widget class="QLabel" name="status">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>540</y>
+      <x>30</x>
+      <y>620</y>
       <width>271</width>
-      <height>121</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="text">
@@ -67,6 +57,38 @@
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>521</width>
+      <height>561</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="image">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>491</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
