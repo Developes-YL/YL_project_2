@@ -6,6 +6,8 @@ from registration import handle_name
 from payment import choice_day
 import registration
 import payment
+import qrcode
+import tempfile
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -42,6 +44,20 @@ def start(message: Message, first_message: bool = True):
     bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
+
+def generation(message):
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(str(message.chat.id))
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    with tempfile.NamedTemporaryFile(delete=False) as temp:
+        img.save(temp.name)
+        temp.flush()
+        temp.seek(0)
+        bot.send_photo(chat_id=message.chat.id, photo=temp)
+
+
+
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
     if message.text is None:
@@ -53,8 +69,8 @@ def handle_text(message):
         bot.register_next_step_handler(message, handle_name)
 
     elif message.text.strip() == 'Получить QR':
-        bot.send_message(message.chat.id, 'В разработке...')
-        start(message, False)
+        bot.send_message(message.chat.id, 'Генерируем Qr код')
+        generation(message)
 
     elif message.text.strip() == 'Запланировать обеды/завтраки':
         choice_day(message)

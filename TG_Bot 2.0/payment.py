@@ -151,7 +151,7 @@ def pay_bot(message):
     bot.send_message(message.chat.id, 'Общая стоимость:' + str((brekfast_final_cost + lunch_final_cost)))
     bot.send_message(message.chat.id, 'Что бы оплатить питание, переведите ' + str((brekfast_final_cost +
                                                                                     lunch_final_cost)) +
-                     ' на тинькофф по номеру +79164877877')
+                     ' на киви по номеру +79253503525')
     # далее должна быть функция получения номера перевода
     # а в конце
     start(message, False)
