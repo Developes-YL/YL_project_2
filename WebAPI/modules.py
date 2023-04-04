@@ -20,10 +20,10 @@ def get_inf(student_id: int, student_code: str) -> dict:
 def load_inf_from_dp(student_id: int):
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    que = f'SELECT surname, name, patronymic, grade FROM Students WHERE id = {student_id}'
+    que = f'SELECT surname, name, patronymic, grade_number, grade_letter FROM Students WHERE id = {student_id}'
     result = cur.execute(que).fetchone()
     name = ' '.join(result[:3])
-    grade = result[3]
+    grade = ' '.join(result[3:])
     con.close()
     return [name, grade]
 

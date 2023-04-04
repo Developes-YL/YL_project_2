@@ -6,7 +6,7 @@ def new_path(name: str) -> str:
 
 def read_settings_file() -> list:
     with open(SETTINGS, mode="r", encoding="utf-8") as f:
-        lines = f.readlines()
+        lines = f.readlines()[:8]
         lines = list(map(lambda x: x.rstrip("\n").split('=')[1], lines))
         prices = list(map(int, lines[:4]))
         time = lines[4:]
