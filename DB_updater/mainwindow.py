@@ -15,12 +15,14 @@ class MyWindow(QMainWindow):
         con = sqlite3.connect("MainDB2.db")
         cur = con.cursor()
         result = cur.execute("SELECT * FROM Students").fetchall()
-        self.tableWidget.setRowCount(len(result))
-        self.tableWidget.setColumnCount(len(result[0]) - 1)
+        result2 = cur.execute("SELECT * FROM Request").fetchall()
+        result3 = []
+        for i in range(len(result)):
+            result3.append((result[0][0], result[0][2], result[0][3], result[0][4], result[0][5], result2[0][1], result2[0][3]))
+        print(result3)
+        self.tableWidget.setRowCount(len(result3))
+        self.tableWidget.setColumnCount(len(result3[0]))
         self.titles = [description[0] for description in cur.description]
-        for i, elem in enumerate(result):
+        for i, elem in enumerate(result3):
             for j, val in enumerate(elem):
-                if i == 0:
-                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
-                if j > 1:
-                    self.tableWidget.setItem(i, j - 1, QTableWidgetItem(str(val)))
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(val)))
