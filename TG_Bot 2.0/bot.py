@@ -1,5 +1,6 @@
 from telebot import TeleBot
 from telebot import types
+import sqlite3
 from telebot.types import Message
 from modules_for_db import is_user_in_db, get_name_from_db
 from registration import handle_name
@@ -44,18 +45,40 @@ def start(message: Message, first_message: bool = True):
     bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
+def lunch_choise(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    items = []
+    items.append(types.KeyboardButton("Завтрак"))
+    items.append(types.KeyboardButton("Обед"))
+    for item in items:
+        markup.add(item)
+    bot.send_message(message.chat.id, 'Выберите что сейчас, обед или завтрак?', reply_markup=markup)
+    bot.register_next_step_handler(message, lunch_choise1)
 
-def generation(message):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(str(message.chat.id))
-    qr.make(fit=True)
-    img = qr.make_image(fill_color='black', back_color='white')
-    with tempfile.NamedTemporaryFile(delete=False) as temp:
-        img.save(temp.name)
-        temp.flush()
-        temp.seek(0)
-        bot.send_photo(chat_id=message.chat.id, photo=temp)
 
+def lunch_choise1(message):
+    if message.text.strip() == 'Завтрак':
+        for_lunch = False
+        print(get_code(message.chat.id, for_lunch))
+    elif message.text.strip() == 'Обед':
+        for_lunch = True
+        print(get_code(message.chat.id, for_lunch))
+    else:
+        bot.send_message(message.chat.id, 'Вы неверно выбрали действие', reply_markup=types.ReplyKeyboardRemove())
+        lunch_choise(message)
+
+
+def get_code(tg_id: str, for_lunch: bool) -> str:
+    conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
+    cur = conn.cursor()  # создание курсора
+    st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()[0]
+    print(st_id)
+    cur.execute(f'SELECT {"lunch" if for_lunch else "breakfast"} FROM Codes WHERE id = {st_id}')
+    code = cur.fetchone()  # получение результата
+    print(code)
+    conn.close()  # закрытие соединения с базой данных
+
+    return code[0] if code else 'error'
 
 
 @bot.message_handler(content_types=["text"])
@@ -70,7 +93,7 @@ def handle_text(message):
 
     elif message.text.strip() == 'Получить QR':
         bot.send_message(message.chat.id, 'Генерируем Qr код')
-        generation(message)
+        lunch_choise(message)
 
     elif message.text.strip() == 'Запланировать обеды/завтраки':
         choice_day(message)
