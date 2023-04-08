@@ -1,4 +1,5 @@
 import sqlite3
+from . import TIME_CHANGE, TIME_STOP, TIME_START
 
 
 def get_name_from_db(tg_id: str) -> list:
@@ -21,6 +22,29 @@ def is_user_in_db(tg_id: int) -> bool:
     res = cur.execute(que).fetchall()
     con.close()
     return len(res) != 0
+
+
+def get_code(tg_id: str) -> str:
+    time_now = datetime.datetime.now().time()
+    time_change = datetime.datetime.strptime(TIME_CHANGE, "%H:%M").time()
+    time_stop = datetime.datetime.strptime(TIME_STOP, "%H:%M").time()
+    time_start = datetime.datetime.strptime(TIME_START, "%H:%M").time()
+    if time_now < time_start:
+        return "error"
+    if time_now > time_stop:
+        return "error"
+    if time_now > time_change:
+        for_lunch = True
+    else:
+        for_lunch = False
+
+    conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
+    cur = conn.cursor()  # создание курсора
+    st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()[0]
+    cur.execute(f'SELECT {"lunch" if for_lunch else "breakfast"} FROM Codes WHERE id = {st_id}')
+    code = cur.fetchone()  # получение результата
+    conn.close()  # закрытие соединения с базой данных
+    return code[0] if code else 'error'
 
 
 def add_inf_to_db(inf: dict):
