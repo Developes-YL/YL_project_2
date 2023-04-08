@@ -1,5 +1,20 @@
 import sqlite3
-from . import TIME_CHANGE, TIME_STOP, TIME_START
+import datetime
+
+
+def check_time_in_interval(start_time_str, end_time_str):
+    current_time = datetime.datetime.now().time()
+
+    # преобразуем строки с начальным и конечным временем в объекты time
+    start_time = datetime.datetime.strptime(start_time_str, '%H:%M').time()
+    end_time = datetime.datetime.strptime(end_time_str, '%H:%M').time()
+
+    if start_time <= current_time <= end_time:
+        return True
+    else:
+        return False
+
+
 
 
 def get_name_from_db(tg_id: str) -> list:
@@ -25,19 +40,7 @@ def is_user_in_db(tg_id: int) -> bool:
 
 
 def get_code(tg_id: str) -> str:
-    time_now = datetime.datetime.now().time()
-    time_change = datetime.datetime.strptime(TIME_CHANGE, "%H:%M").time()
-    time_stop = datetime.datetime.strptime(TIME_STOP, "%H:%M").time()
-    time_start = datetime.datetime.strptime(TIME_START, "%H:%M").time()
-    if time_now < time_start:
-        return "error"
-    if time_now > time_stop:
-        return "error"
-    if time_now > time_change:
-        for_lunch = True
-    else:
-        for_lunch = False
-
+    for_lunch = True
     conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
     cur = conn.cursor()  # создание курсора
     st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()[0]

@@ -2,7 +2,7 @@ from telebot import TeleBot
 from telebot import types
 import sqlite3
 from telebot.types import Message
-from modules_for_db import is_user_in_db, get_name_from_db, get_code
+from modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
 from registration import handle_name
 from payment import choice_day
 import registration
@@ -55,10 +55,19 @@ def lunch_choise(message):
     bot.send_message(message.chat.id, 'Выберите что сейчас, обед или завтрак?', reply_markup=markup)
     bot.register_next_step_handler(message, lunch_choise1)
 
-
 def lunch_choise1(message):
-    if message.text.strip() in ['Завтрак', 'Обед']:
-        qr_generation(message)
+    if message.text.strip() == 'Завтрак':
+        if check_time_in_interval('09:25', '9:50'):
+            qr_generation(message)
+        else:
+            bot.send_message(message.chat.id, 'Сейчас не время для завтрака!')
+    elif message.text.strip() == 'Обед':
+        if check_time_in_interval('12:25', '12:50'):
+            qr_generation(message)
+        elif check_time_in_interval('13:30', '13:55'):
+            qr_generation(message)
+        else:
+            bot.send_message(message.chat.id, 'Сейчас не время для обеда!')
     else:
         bot.send_message(message.chat.id, 'Вы неверно выбрали действие', reply_markup=types.ReplyKeyboardRemove())
         lunch_choise(message)
