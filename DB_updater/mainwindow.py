@@ -40,6 +40,10 @@ class MyWindow(MainW):
 
     def reject(self):
         index = self.spinBox.value()
+        if len(self.res) == 0:
+            return
+        if index not in list(map(lambda x: x[-1], self.res)):
+            return
         n = list(map(lambda x: x[-1], self.res)).index(index)
         if self.res[n] not in self.rejected:
             self.rejected.append(self.res[n])
