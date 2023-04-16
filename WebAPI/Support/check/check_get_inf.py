@@ -12,8 +12,8 @@ with open(file=CODE_FILE, mode="r", encoding="utf-8") as f:
 try:
     res = requests.get(f"http://{HOST}:{PORT}/get_information",
                        params={"code": current_code, "id": "0", "student_code": "2"}).json()
-except:
-    print("Error1")
+except Exception as exc:
+    print("Error1 - " + str(exc.__class__.__name__))
     sys.exit()
 
 if res["ok"]:
