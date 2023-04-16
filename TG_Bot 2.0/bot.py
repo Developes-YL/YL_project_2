@@ -1,11 +1,15 @@
 from telebot import TeleBot
 from telebot import types
 from telebot.types import Message
-from modules_for_db import is_user_in_db, get_name_from_db
+import payment
+import qrcode
+import tempfile
+
+from modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
+from modules import setup_time_func
 from registration import handle_name
 from payment import choice_day
 import registration
-import payment
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -42,6 +46,48 @@ def start(message: Message, first_message: bool = True):
     bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
+def lunch_choise(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    items = [types.KeyboardButton("Завтрак"), types.KeyboardButton("Обед")]
+    for item in items:
+        markup.add(item)
+    bot.send_message(message.chat.id, 'Выберите что сейчас, обед или завтрак?', reply_markup=markup)
+    bot.register_next_step_handler(message, lunch_choise1)
+
+
+def lunch_choise1(message):
+    if message.text.strip() == 'Завтрак':
+        if check_time_in_interval('09:25', '9:50'):
+            qr_generation(message)
+        else:
+            bot.send_message(message.chat.id, 'Сейчас не время для завтрака!')
+            start(message, False)
+    elif message.text.strip() == 'Обед':
+        if check_time_in_interval('12:25', '12:50'):
+            qr_generation(message)
+        elif check_time_in_interval('13:30', '13:55'):
+            qr_generation(message)
+        else:
+            bot.send_message(message.chat.id, 'Сейчас не время для обеда!')
+            start(message, False)
+    else:
+        bot.send_message(message.chat.id, 'Вы неверно выбрали действие', reply_markup=types.ReplyKeyboardRemove())
+        lunch_choise(message)
+
+
+def qr_generation(message):
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(str(message.chat.id) + ' ' + get_code(message.chat.id))
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    with tempfile.NamedTemporaryFile(delete=False) as temp:
+        img.save(temp.name)
+        temp.flush()
+        temp.seek(0)
+        bot.send_photo(chat_id=message.chat.id, photo=temp, reply_markup=types.ReplyKeyboardRemove())
+        start(message, False)
+
+
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
     if message.text is None:
@@ -53,8 +99,8 @@ def handle_text(message):
         bot.register_next_step_handler(message, handle_name)
 
     elif message.text.strip() == 'Получить QR':
-        bot.send_message(message.chat.id, 'В разработке...')
-        start(message, False)
+
+        lunch_choise(message)
 
     elif message.text.strip() == 'Запланировать обеды/завтраки':
         choice_day(message)
@@ -63,6 +109,7 @@ def handle_text(message):
 set_bot(bot)
 
 if __name__ == "__main__":
+    setup_time_func()
     print("Бот начал работу")
     bot.infinity_polling()
     print("Бот завершил работу")

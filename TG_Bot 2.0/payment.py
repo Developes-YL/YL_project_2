@@ -1,7 +1,7 @@
 from telebot import TeleBot, types
 from telebot.types import Message
 
-from modules_for_db import get_prices
+from modules_for_db import get_prices, add_days_to_db
 
 days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
 bot: TeleBot = None
@@ -70,7 +70,8 @@ def choice_day_finish(message: Message):
                 if day in lunch:
                     ans += "обед "
                 ans += "\n"
-            bot.send_message(message.chat.id, ans)
+            markup = types.ReplyKeyboardRemove()
+            bot.send_message(message.chat.id, ans, reply_markup=markup)
             pay_bot(message)
 
         else:
@@ -129,29 +130,66 @@ def pay_bot(message):
     with open("../DB/days_next.txt") as file:
         for day in days:
             d = file.readline().strip().split(':')[1].split(';')
+            d.remove('')
             days_in_month[day] = d
 
-    brekfast_cost, lunch_cost = get_prices()[2:]
+    breakfast_cost, lunch_cost = get_prices()[2:]
     count_lunch = 0
     count_breakfast = 0
-
     # здесь могут происходить пересчеты дней,
     # если пользователь хочет отказаться от питания в конкретные дни
-
     for day in days:
+        print(day, days_in_month[day])
         if day in breakfast:
             count_breakfast += len(days_in_month[day])
         if day in lunch:
             count_lunch += len(days_in_month[day])
-
-    brekfast_final_cost = brekfast_cost * count_breakfast
+    print(count_breakfast, count_lunch)
+    brekfast_final_cost = breakfast_cost * count_breakfast
     lunch_final_cost = lunch_cost * count_lunch
     bot.send_message(message.chat.id, 'Стоимость завтраков:' + str(brekfast_final_cost))
     bot.send_message(message.chat.id, 'Стоимость обедов:' + str(lunch_final_cost))
     bot.send_message(message.chat.id, 'Общая стоимость:' + str((brekfast_final_cost + lunch_final_cost)))
     bot.send_message(message.chat.id, 'Что бы оплатить питание, переведите ' + str((brekfast_final_cost +
                                                                                     lunch_final_cost)) +
-                     ' на тинькофф по номеру +79164877877')
-    # далее должна быть функция получения номера перевода
-    # а в конце
-    start(message, False)
+                     ' на карту по номеру телефона:  +7**********')
+    bot.send_message(message.chat.id, "Для подтверждения оплаты пришлите номер перевода\n(введите 0 для отмены)")
+    bot.register_next_step_handler(message, lambda x: get_number(x, brekfast_final_cost + lunch_final_cost))
+
+
+def get_number(message: Message, sum: int):
+    number = message.text
+    if not number.isdigit():
+        bot.send_message(message.chat.id, 'Номер перевода некорректный\n(введите 0 для отмены)')
+        bot.register_next_step_handler(message, lambda x: get_number(x, sum))
+        return
+    if number == "0":
+        start(message, False)
+        return
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    yes = types.KeyboardButton("Да")
+    no = types.KeyboardButton("Нет")
+    reject = types.KeyboardButton("Отмена")
+    markup.add(yes)
+    markup.add(no)
+    markup.add(reject)
+    bot.send_message(message.chat.id, 'Уверены, что номер перевода корректен?\n'
+                                      '(после подтверждения нельзя будет исправить)', reply_markup=markup)
+    bot.register_next_step_handler(message, lambda x: add_to_db(x, number, sum))
+
+
+def add_to_db(message: Message, number: str, sum: int):
+    if message.text == "Да":
+        a = dict()
+        a["lunch"] = lunch
+        a["breakfast"] = breakfast
+        bot.send_message(message.chat.id, 'Теперь дождитесь проверки от администратора')
+        add_days_to_db(a, message.chat.id, number, sum)
+        start(message, False)
+    elif message.text == "Отмена":
+        start(message, False)
+    else:
+        markup = types.ReplyKeyboardRemove()
+        bot.send_message(message.chat.id, 'Введите правильный номер перевода\n(введите 0 для отмены)',
+                         reply_markup=markup)
+        bot.register_next_step_handler(message, get_number)
