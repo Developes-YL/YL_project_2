@@ -15,8 +15,6 @@ def check_time_in_interval(start_time_str, end_time_str):
         return False
 
 
-
-
 def get_name_from_db(tg_id: str) -> list:
     con = sqlite3.connect("../DB/MainDB.db")
     cur = con.cursor()
@@ -47,7 +45,7 @@ def get_code(tg_id: str) -> str:
     cur.execute(f'SELECT {"lunch" if for_lunch else "breakfast"} FROM Codes WHERE id = {st_id}')
     code = cur.fetchone()  # получение результата
     conn.close()  # закрытие соединения с базой данных
-    return code[0] if code else 'error'
+    return code[0] if code[0] != '0' else 'error'
 
 
 def add_inf_to_db(inf: dict):
@@ -77,3 +75,32 @@ def get_classes():
         class_numbers = file.readline().strip().split(':')[1].split(';')
         class_letters = file.readline().strip().split(':')[1].split(';')
     return [class_numbers, class_letters]
+
+
+def add_days_to_db(days: dict, tg_id: int, number: str, sum: int):
+    con = sqlite3.connect("../DB/MainDB.db")
+    cur = con.cursor()
+    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (tg_id,)).fetchone()[0]
+    days_in_month = dict()
+    with open("../DB/days_next.txt") as file:
+        for day in ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]:
+            d = file.readline().strip().split(':')[1].split(';')
+            d.remove('')
+            days_in_month[day] = d
+    lunch = []
+    breakfast = []
+    for day in days_in_month.keys():
+        if day in days["lunch"]:
+            for elem in days_in_month[day]:
+                lunch.append(int(elem))
+        if day in days["breakfast"]:
+            for elem in days_in_month[day]:
+                breakfast.append(int(elem))
+    indexes = cur.execute("SELECT id FROM Request").fetchall()
+    if (id,) in indexes:
+        cur.execute(f"DELETE FROM Request WHERE id = {id}")
+    lunch = ';'.join(map(str, lunch))
+    breakfast = ';'.join(map(str, breakfast))
+    cur.execute(f"INSERT INTO Request VALUES {(id, sum, number, lunch, breakfast)}")
+    con.commit()
+    con.close()

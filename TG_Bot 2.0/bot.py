@@ -1,14 +1,15 @@
 from telebot import TeleBot
 from telebot import types
-import sqlite3
 from telebot.types import Message
-from modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
-from registration import handle_name
-from payment import choice_day
-import registration
 import payment
 import qrcode
 import tempfile
+
+from modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
+from modules import setup_time_func
+from registration import handle_name
+from payment import choice_day
+import registration
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -47,13 +48,12 @@ def start(message: Message, first_message: bool = True):
 
 def lunch_choise(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    items = []
-    items.append(types.KeyboardButton("Завтрак"))
-    items.append(types.KeyboardButton("Обед"))
+    items = [types.KeyboardButton("Завтрак"), types.KeyboardButton("Обед")]
     for item in items:
         markup.add(item)
     bot.send_message(message.chat.id, 'Выберите что сейчас, обед или завтрак?', reply_markup=markup)
     bot.register_next_step_handler(message, lunch_choise1)
+
 
 def lunch_choise1(message):
     if message.text.strip() == 'Завтрак':
@@ -107,6 +107,7 @@ def handle_text(message):
 set_bot(bot)
 
 if __name__ == "__main__":
+    setup_time_func()
     print("Бот начал работу")
     bot.infinity_polling()
     print("Бот завершил работу")

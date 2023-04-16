@@ -1,16 +1,11 @@
-import sqlite3
 import bot
 
 
-def update_result():
-    con = sqlite3.connect("../DB/MainDB.db")
-    cur = con.cursor()
-    ids = cur.execute("SELECT id FROM Rejected_requests").fetchall()
-    for id0 in ids:
-        print(id0)
-        tg_id = cur.execute(f"SELECT tg_id FROM Students WHERE id = {id0[0]}").fetchone()
-        print(tg_id[0])
-        bot.bot.send_message(tg_id[0], "Ваша перевод некорректен")
+def reject(tg_ids: list):
+    for tg_id in tg_ids:
+        bot.bot.send_message(tg_id, "!!Ваша оплата некорректна!!")
 
 
-update_result()
+def accept(tg_ids: list):
+    for tg_id in tg_ids:
+        bot.bot.send_message(tg_id, "Ваша оплата принята")

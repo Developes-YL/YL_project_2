@@ -1,7 +1,7 @@
-price_this_month_breakfast=185
-price_this_month_lunch=345
-price_next_month_breakfast=186
-price_next_month_lunch=380
+price_this_month_breakfast=122
+price_this_month_lunch=229
+price_next_month_breakfast=122
+price_next_month_lunch=229
 time_start=8:00
 time_change=11:00
 time_stop=15:00
