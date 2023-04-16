@@ -61,6 +61,7 @@ def lunch_choise1(message):
             qr_generation(message)
         else:
             bot.send_message(message.chat.id, 'Сейчас не время для завтрака!')
+            start(message, False)
     elif message.text.strip() == 'Обед':
         if check_time_in_interval('12:25', '12:50'):
             qr_generation(message)
@@ -68,6 +69,7 @@ def lunch_choise1(message):
             qr_generation(message)
         else:
             bot.send_message(message.chat.id, 'Сейчас не время для обеда!')
+            start(message, False)
     else:
         bot.send_message(message.chat.id, 'Вы неверно выбрали действие', reply_markup=types.ReplyKeyboardRemove())
         lunch_choise(message)

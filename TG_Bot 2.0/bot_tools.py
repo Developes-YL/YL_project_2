@@ -10,7 +10,7 @@ def update_result():
         print(id0)
         tg_id = cur.execute(f"SELECT tg_id FROM Students WHERE id = {id0[0]}").fetchone()
         print(tg_id[0])
-        bot.bot.send_message(tg_id[0], "Ваша перевод некорректен")
+        bot.bot.send_message(tg_id[0], "Ваш перевод некорректен")
 
 
 update_result()
