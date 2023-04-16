@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 
-from YL_project_2.DB_updater import change_window
+from DB_updater import change_window
 from password_window import MyWindow2
 
 

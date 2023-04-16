@@ -1,7 +1,9 @@
+import sqlite3
+
 from PyQt5.QtWidgets import QDialog
 from PyQt5 import uic
 
-from YL_project_2.DB_updater import change_window
+from DB_updater import change_window
 from mainwindow import MyWindow
 
 
@@ -13,14 +15,12 @@ class MyWindow2(QDialog):
         self.checked = 0
 
     def check(self):
-        login = self.lineEdit.text()
-        password = self.lineEdit_2.text()
-        self.lineEdit_2.setText("")
-        with open("Support/passwords.txt", "r") as f:
-            passwords = dict()
-            lines = f.readlines()
-            for line in lines[1:]:
-                passwords[line.split(';')[0]] = line.split(';')[1].rstrip('\n')
-
-        if login in passwords.keys() and password == passwords[login]:
+        login = self.login.text()
+        password = self.password.text()
+        self.password.setText("")
+        con = sqlite3.connect("../DB/MainDB.db")
+        cur = con.cursor()
+        res = cur.execute(f"SELECT password FROM Admins WHERE login = '{login}'").fetchall()
+        con.close()
+        if len(res) > 0 and str(res[0][0]) == password:
             change_window(MyWindow)
