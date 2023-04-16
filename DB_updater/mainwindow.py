@@ -1,5 +1,5 @@
 import sqlite3
-
+import requests
 from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 from Support.mainW import MainW
@@ -19,7 +19,7 @@ class MyWindow(MainW):
         con = sqlite3.connect("../DB/MainDB.db")
         cur = con.cursor()
         que = """SELECT Students.id, Students.surname, Students.name, 
-                Students.patronymic, Students.grade_number, Students.grade_letter, Request.codes, 
+                Students.patronymic, Students.grade_number, Students.grade_letter, Request.number, 
                 Request.sum FROM Students JOIN Request ON Students.id = Request.id"""
         self.res = cur.execute(que).fetchall()
         self.res = list(map(lambda x: [*x, self.res.index(x)], self.res))
@@ -61,14 +61,34 @@ class MyWindow(MainW):
         indexes_l = list(map(lambda x: x[0], cur.execute("SELECT id FROM lunch_next").fetchall()))
         indexes_b = list(map(lambda x: x[0], cur.execute("SELECT id FROM breakfast_next").fetchall()))
         for elem in self.res:
+            tg_id = cur.execute("SELECT tg_id FROM Students WHERE id = ?", (elem[0],)).fetchone()[0]
             if elem[0] in map(lambda x: x[0], self.rejected):
-                pass
-                # отправка сообщения
+                with open("../TG_Bot/Support/TOKEN.txt") as file:
+                    token = file.readline().rstrip()
+                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}&text=!!Ваша оплата некорректна!!")
             else:
-                days_l, days_b = cur.execute("SELECT days_l, days_b "
-                                             "FROM Request WHERE id = ?", (elem[0],)).fetchall()[0]
-                days_l = days_l.split(';')
-                days_b = days_b.split(';')
+                with open("../TG_Bot/Support/TOKEN.txt") as file:
+                    token = file.readline().rstrip()
+                print(token)
+                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}&text=Ваша оплата принята")
+                res = cur.execute("""SELECT days_l, days_b FROM 
+                            Request WHERE id = ?""", (elem[0],)).fetchall()
+                if not res:
+                    continue
+                days_l, days_b = map(str, res[0])
+                if days_l != "" and days_l and ";" in days_l:
+                    days_l = days_l.split(';')
+                elif ";" not in days_l:
+                    days_l = [days_l]
+                else:
+                    days_l = []
+                if days_b != "" and days_b and ";" in days_b:
+                    days_b = days_b.split(';')
+                elif ";" not in days_b:
+                    days_b = [days_b]
+                else:
+                    days_b = []
+                print(days_b, days_l)
                 days = range(1, 32)
                 lst = []
                 for n, day in enumerate(days):
@@ -81,6 +101,7 @@ class MyWindow(MainW):
                         lst[n].append("+")
                     else:
                         lst[n].append("-")
+
                 lunches = [elem[0]] + list(map(lambda x: x[0], lst))
                 breakfasts = [elem[0]] + list(map(lambda x: x[1], lst))
                 q = "INSERT INTO lunch_next VALUES (" + str(lunches)[1:-1] + ")"
@@ -89,8 +110,7 @@ class MyWindow(MainW):
                 q = "INSERT INTO breakfast_next VALUES (" + str(breakfasts)[1:-1] + ")"
                 if elem[0] not in indexes_b:
                     cur.execute(q)
-            cur.execute(que, (elem[0], )).fetchall()
-
+            cur.execute(que, (elem[0],)).fetchall()
         self.rejected = []
         self.res = []
         con.commit()

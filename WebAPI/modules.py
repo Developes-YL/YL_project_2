@@ -10,9 +10,17 @@ from WebAPI import TIME_CHANGE, DB, CODE_FILE, PHOTOS_DIR
 
 def get_inf(student_id: int, student_code: str) -> dict:
     ans = list()
-    ans.append(get_status(student_id, student_code))
-    ans.extend(load_inf_from_dp(student_id))
+    res = get_status(student_id, student_code)
+    if res == "error":
+        return "error"
+    ans.append(res)
+    res = load_inf_from_dp(student_id)
+    if res == "error":
+        return "error"
+    ans.extend(res)
     image = get_photo_from_db(student_id)
+    if image == "error":
+        return "error"
     ans.append(dumps(array(image).tolist()))
     return ans
 
@@ -22,6 +30,9 @@ def load_inf_from_dp(student_id: int):
     cur = con.cursor()
     que = f'SELECT surname, name, patronymic, grade_number, grade_letter FROM Students WHERE id = {student_id}'
     result = cur.execute(que).fetchone()
+    if not result:
+        return "error"
+    result = list(map(str, result))
     name = ' '.join(result[:3])
     grade = ' '.join(result[3:])
     con.close()
@@ -39,9 +50,11 @@ def get_status(student_id: int, code: str) -> bool:
     con = sqlite3.connect(DB)
     cur = con.cursor()
     que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {student_id}'
-    result = cur.execute(que).fetchone()[0]
+    result = cur.execute(que).fetchone()
+    if not result:
+        return "error"
     con.close()
-    return result == code
+    return result[0] == code
 
 
 def check_code(code: str) -> bool:
@@ -51,6 +64,9 @@ def check_code(code: str) -> bool:
 
 
 def get_photo_from_db(student_id):
-    image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
-    image = Image.open(image_name)
+    try:
+        image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
+        image = Image.open(image_name)
+    except:
+        return "error"
     return image

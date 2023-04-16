@@ -3,7 +3,7 @@ import os
 from telebot import TeleBot
 from telebot.types import Message
 
-from modules_for_db import add_inf_to_db, get_classes
+from TG_Bot.modules_for_db import add_inf_to_db, get_classes
 
 
 bot: TeleBot = None
@@ -57,7 +57,7 @@ def handle_grade(message: Message, inf: dict):
     if grade_number in class_numbers:
         if grade_letter.upper() in class_letters:
             answer = 'Класс успешно определён!\nОтправьте ваше фото :)'
-            inf["grade_letter"] = grade_letter
+            inf["grade_letter"] = grade_letter.upper()
             inf["grade_number"] = grade_number
             next_function = (lambda x: handle_docs_photo(x, inf))
         else:

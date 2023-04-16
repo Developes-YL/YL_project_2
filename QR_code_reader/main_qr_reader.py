@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         else:
             self.reset_status()
             self.status_2.setText(res["description"])
-            return ["", "", QPixmap()]
+            return []
 
     def start_camera(self):
         try:
@@ -101,6 +101,7 @@ class MainWindow(QMainWindow):
         self.about.setText("")
         self.status.setText("")
         self.status_2.setText("")
+        self.image.setPixmap(QPixmap())
 
     def get_text_from_qr(self):
         frame = self.vs.read()

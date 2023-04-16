@@ -1,15 +1,14 @@
 from telebot import TeleBot
 from telebot import types
 from telebot.types import Message
-import payment
 import qrcode
 import tempfile
 
-from modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
-from modules import setup_time_func
-from registration import handle_name
-from payment import choice_day
-import registration
+from TG_Bot import payment, registration
+from TG_Bot.modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
+from TG_Bot.modules import setup_time_func
+from TG_Bot.registration import handle_name
+from TG_Bot.payment import choice_day
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()

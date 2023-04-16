@@ -1,7 +1,7 @@
 from telebot import TeleBot, types
 from telebot.types import Message
 
-from modules_for_db import get_prices, add_days_to_db
+from TG_Bot.modules_for_db import get_prices, add_days_to_db
 
 days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
 bot: TeleBot = None
@@ -30,6 +30,8 @@ def choice_day(message: Message):
 
 
 def choice_day_finish(message: Message):
+    global lunch
+    global breakfast
     if message.text is None:
         bot.register_next_step_handler(message, choice_day_finish)
         return
@@ -79,6 +81,8 @@ def choice_day_finish(message: Message):
             choice_day(message)
 
     elif message.text.strip() == "Назад":
+        lunch = set()
+        breakfast = set()
         start(message, False)
         return
 
@@ -139,12 +143,10 @@ def pay_bot(message):
     # здесь могут происходить пересчеты дней,
     # если пользователь хочет отказаться от питания в конкретные дни
     for day in days:
-        print(day, days_in_month[day])
         if day in breakfast:
             count_breakfast += len(days_in_month[day])
         if day in lunch:
             count_lunch += len(days_in_month[day])
-    print(count_breakfast, count_lunch)
     brekfast_final_cost = breakfast_cost * count_breakfast
     lunch_final_cost = lunch_cost * count_lunch
     bot.send_message(message.chat.id, 'Стоимость завтраков:' + str(brekfast_final_cost))
@@ -164,6 +166,10 @@ def get_number(message: Message, sum: int):
         bot.register_next_step_handler(message, lambda x: get_number(x, sum))
         return
     if number == "0":
+        global lunch
+        global breakfast
+        lunch = set()
+        breakfast = set()
         start(message, False)
         return
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -179,6 +185,10 @@ def get_number(message: Message, sum: int):
 
 
 def add_to_db(message: Message, number: str, sum: int):
+    global lunch
+    global breakfast
+    lunch = set()
+    breakfast = set()
     if message.text == "Да":
         a = dict()
         a["lunch"] = lunch
@@ -192,4 +202,4 @@ def add_to_db(message: Message, number: str, sum: int):
         markup = types.ReplyKeyboardRemove()
         bot.send_message(message.chat.id, 'Введите правильный номер перевода\n(введите 0 для отмены)',
                          reply_markup=markup)
-        bot.register_next_step_handler(message, get_number)
+        bot.register_next_step_handler(message, lambda x: get_number(x, sum))

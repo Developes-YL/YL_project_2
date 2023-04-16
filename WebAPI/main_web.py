@@ -23,7 +23,7 @@ def get_information() -> dict:
     student_code = request.query.student_code
 
     res = get_inf(student_id, student_code)
-    if res:
+    if res and res != "error":
         status, name, grade, photo = res
         return {"ok": True, "status": status, "name": name, "grade": grade, "image": photo}
     return {"ok": False, "description": "ошибка во время получения информации из БД"}
