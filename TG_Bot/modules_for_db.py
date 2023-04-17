@@ -38,7 +38,7 @@ def is_user_in_db(tg_id: int) -> bool:
 
 
 def get_code(tg_id: str) -> str:
-    for_lunch = True
+    for_lunch = False
     conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
     cur = conn.cursor()  # создание курсора
     st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()[0]
@@ -78,6 +78,7 @@ def get_classes():
 
 
 def add_days_to_db(days: dict, tg_id: int, number: str, sum: int):
+    print(days, tg_id, number, sum)
     con = sqlite3.connect("../DB/MainDB.db")
     cur = con.cursor()
     id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (tg_id,)).fetchone()[0]
@@ -101,6 +102,11 @@ def add_days_to_db(days: dict, tg_id: int, number: str, sum: int):
         cur.execute(f"DELETE FROM Request WHERE id = {id}")
     lunch = ';'.join(map(str, lunch))
     breakfast = ';'.join(map(str, breakfast))
-    cur.execute(f"INSERT INTO Request VALUES {(id, sum, number, lunch, breakfast)}")
+    cur.execute(f"INSERT INTO Request VALUES {(id, number, sum, lunch, breakfast)}")
     con.commit()
     con.close()
+
+
+if __name__=="__main__":
+    add_days_to_db({'lunch': {'Понедельник', 'Среда', 'Вторник'}, 'breakfast': {'Понедельник', 'Среда', 'Вторник'}},
+                   5065958894, 123123, 4914)

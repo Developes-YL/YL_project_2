@@ -1,7 +1,7 @@
+import qrcode
 from telebot import TeleBot
 from telebot import types
 from telebot.types import Message
-import qrcode
 import tempfile
 
 from TG_Bot import payment, registration
@@ -56,7 +56,7 @@ def lunch_choise(message):
 
 def lunch_choise1(message):
     if message.text.strip() == 'Завтрак':
-        if check_time_in_interval('09:25', '9:50'):
+        if check_time_in_interval('07:25', '9:50'):
             qr_generation(message)
         else:
             bot.send_message(message.chat.id, 'Сейчас не время для завтрака!')

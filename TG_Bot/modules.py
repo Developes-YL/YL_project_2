@@ -87,3 +87,8 @@ def generate_code() -> str:
     chars = string.ascii_letters + string.digits
     code = ''.join(random.choice(chars) for _ in range(30))
     return code
+
+
+if __name__ == "__main__":
+    #change_month()
+    change_day()

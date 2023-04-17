@@ -187,16 +187,21 @@ def get_number(message: Message, sum: int):
 def add_to_db(message: Message, number: str, sum: int):
     global lunch
     global breakfast
-    lunch = set()
-    breakfast = set()
     if message.text == "Да":
         a = dict()
         a["lunch"] = lunch
         a["breakfast"] = breakfast
+        lunch = set()
+        breakfast = set()
         bot.send_message(message.chat.id, 'Теперь дождитесь проверки от администратора')
         add_days_to_db(a, message.chat.id, number, sum)
         start(message, False)
     elif message.text == "Отмена":
+        a = dict()
+        a["lunch"] = lunch
+        a["breakfast"] = breakfast
+        lunch = set()
+        breakfast = set()
         start(message, False)
     else:
         markup = types.ReplyKeyboardRemove()

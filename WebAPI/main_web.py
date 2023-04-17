@@ -21,8 +21,8 @@ def get_information() -> dict:
     if not hasattr(request.query, "student_code"):
         return {"ok": False, "description": "неверный id"}
     student_code = request.query.student_code
-
     res = get_inf(student_id, student_code)
+    print(res)
     if res and res != "error":
         status, name, grade, photo = res
         return {"ok": True, "status": status, "name": name, "grade": grade, "image": photo}

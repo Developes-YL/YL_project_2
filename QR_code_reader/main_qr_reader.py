@@ -67,13 +67,15 @@ class MainWindow(QMainWindow):
         if len(words) != 2:
             return False
 
-        code, student_id = words
+        student_id, code = words
         res = get_inf_from_bot(code, student_id)
+        print(res["ok"])
         if res["ok"]:
             img = Image.fromarray(array(loads(res["image"]), dtype='uint8'))
             qim = ImageQt(img)
             pix = QPixmap.fromImage(qim)
             ans = str(res["status"]), res["name"] + "   " + res["grade"], pix
+            print(ans[:-1])
             return ans
         else:
             self.reset_status()

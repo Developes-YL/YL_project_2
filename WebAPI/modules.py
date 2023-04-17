@@ -9,6 +9,7 @@ from WebAPI import TIME_CHANGE, DB, CODE_FILE, PHOTOS_DIR
 
 
 def get_inf(student_id: int, student_code: str) -> dict:
+    print(student_id, student_code)
     ans = list()
     res = get_status(student_id, student_code)
     if res == "error":
@@ -16,10 +17,12 @@ def get_inf(student_id: int, student_code: str) -> dict:
     ans.append(res)
     res = load_inf_from_dp(student_id)
     if res == "error":
+        print(res)
         return "error"
     ans.extend(res)
     image = get_photo_from_db(student_id)
     if image == "error":
+        print(image + "!")
         return "error"
     ans.append(dumps(array(image).tolist()))
     return ans
@@ -28,8 +31,10 @@ def get_inf(student_id: int, student_code: str) -> dict:
 def load_inf_from_dp(student_id: int):
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    que = f'SELECT surname, name, patronymic, grade_number, grade_letter FROM Students WHERE id = {student_id}'
+    print(student_id)
+    que = f'SELECT surname, name, patronymic, grade_number, grade_letter FROM Students WHERE tg_id = {student_id}'
     result = cur.execute(que).fetchone()
+    print(result)
     if not result:
         return "error"
     result = list(map(str, result))
@@ -49,10 +54,14 @@ def get_status(student_id: int, code: str) -> bool:
 
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {student_id}'
+    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (student_id,)).fetchone()[0]
+    que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {id}'
     result = cur.execute(que).fetchone()
-    if not result:
+    cur.execute(f"UPDATE Codes SET {lunch_or_breafast} = '0' WHERE id = {id}")
+    if len(result) == 0:
+        print("error!!")
         return "error"
+    con.commit()
     con.close()
     return result[0] == code
 
@@ -64,9 +73,17 @@ def check_code(code: str) -> bool:
 
 
 def get_photo_from_db(student_id):
+    print(PHOTOS_DIR + "/" + str(student_id) + ".png")
     try:
         image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
         image = Image.open(image_name)
     except:
-        return "error"
+        try:
+            image_name = PHOTOS_DIR + "/" + str(student_id) + ".jpg"
+            image = Image.open(image_name)
+        except:
+            return "error"
+    print(0)
     return image
+
+# sdgdzjzjkjkzj
