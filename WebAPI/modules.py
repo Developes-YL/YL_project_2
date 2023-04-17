@@ -1,3 +1,4 @@
+import base64
 import datetime
 import sqlite3
 from json import dumps
@@ -24,7 +25,8 @@ def get_inf(student_id: int, student_code: str) -> dict:
     if image == "error":
         print(image + "!")
         return "error"
-    ans.append(dumps(array(image).tolist()))
+    #ans.append(dumps(array(image).tolist()))
+    ans.append(image)
     return ans
 
 
@@ -72,18 +74,20 @@ def check_code(code: str) -> bool:
     return current_code == code
 
 
-def get_photo_from_db(student_id):
-    print(PHOTOS_DIR + "/" + str(student_id) + ".png")
+def get_photo_from_db(student_id: int):
     try:
-        image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
-        image = Image.open(image_name)
+        with open(PHOTOS_DIR + "/" + str(student_id) + ".png", "rb") as file:
+            image = base64.b64encode(file.read()).decode("utf-8")
+        # image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
+        # image = Image.open(image_name)
     except:
         try:
-            image_name = PHOTOS_DIR + "/" + str(student_id) + ".jpg"
-            image = Image.open(image_name)
+            with open(PHOTOS_DIR + "/" + str(student_id) + ".jpg", "rb") as file:
+                image = base64.b64encode(file.read()).decode("utf-8")
+            # image_name = PHOTOS_DIR + "/" + str(student_id) + ".jpg"
+            # image = Image.open(image_name)
         except:
             return "error"
-    print(0)
     return image
 
 # sdgdzjzjkjkzj

@@ -1,3 +1,4 @@
+import base64
 import sys
 from json import loads
 
@@ -5,7 +6,7 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
@@ -27,11 +28,14 @@ class MainWindow(QMainWindow):
         self.start_camera()
 
     def set_new_photo(self, pixmap: QPixmap):
-        w_old, h_old = pixmap.width(), pixmap.height()
-        w_max, h_max = self.image.width(), self.image.height()
-        k = max(w_old / w_max, h_old / h_max)
-        pixmap = pixmap.scaled(int(w_old / k), int(h_old / k))
-        self.image.setPixmap(pixmap)
+        try:
+            w_old, h_old = pixmap.width(), pixmap.height()
+            w_max, h_max = self.image.width(), self.image.height()
+            k = max(w_old / w_max, h_old / h_max)
+            pixmap = pixmap.scaled(int(w_old / k), int(h_old / k))
+            self.image.setPixmap(pixmap)
+        except Exception as e:
+            print("image error", e.__class__.__name__)
 
     def load_ui(self, file_name: str):
         uic.loadUi(file_name, self)
@@ -71,8 +75,11 @@ class MainWindow(QMainWindow):
         res = get_inf_from_bot(code, student_id)
         print(res["ok"])
         if res["ok"]:
-            img = Image.fromarray(array(loads(res["image"]), dtype='uint8'))
-            qim = ImageQt(img)
+            print(res["status"])
+            print(res["image"])
+            # img = Image.fromarray(array(loads(res["image"]), dtype='uint8'))
+            # qim = ImageQt(img)
+            qim = QImage.fromData(base64.b64decode(res["image"]))
             pix = QPixmap.fromImage(qim)
             ans = str(res["status"]), res["name"] + "   " + res["grade"], pix
             print(ans[:-1])
