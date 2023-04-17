@@ -53,16 +53,21 @@ def get_status(student_id: int, code: str) -> bool:
         lunch_or_breafast = "lunch"
     else:
         lunch_or_breafast = "breakfast"
-
+    print(lunch_or_breafast, time_now, time_change)
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (student_id,)).fetchone()[0]
+    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (student_id,)).fetchone()
+    if not id or len(id) == 0:
+        return "error"
+    id = id[0]
     que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {id}'
     result = cur.execute(que).fetchone()
     cur.execute(f"UPDATE Codes SET {lunch_or_breafast} = '0' WHERE id = {id}")
     if len(result) == 0:
         print("error!!")
         return "error"
+    if result[0] == "0":
+        return False
     con.commit()
     con.close()
     return result[0] == code
@@ -78,16 +83,10 @@ def get_photo_from_db(student_id: int):
     try:
         with open(PHOTOS_DIR + "/" + str(student_id) + ".png", "rb") as file:
             image = base64.b64encode(file.read()).decode("utf-8")
-        # image_name = PHOTOS_DIR + "/" + str(student_id) + ".png"
-        # image = Image.open(image_name)
     except:
         try:
             with open(PHOTOS_DIR + "/" + str(student_id) + ".jpg", "rb") as file:
                 image = base64.b64encode(file.read()).decode("utf-8")
-            # image_name = PHOTOS_DIR + "/" + str(student_id) + ".jpg"
-            # image = Image.open(image_name)
         except:
             return "error"
     return image
-
-# sdgdzjzjkjkzj

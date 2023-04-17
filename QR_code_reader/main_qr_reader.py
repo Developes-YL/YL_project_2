@@ -6,14 +6,14 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QPixmap, QImage, QFont
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
 from numpy import array
 from pyzbar import pyzbar
 
-from QR_code_reader import UI_FILE
+from QR_code_reader import UI_FILE, ACCEPT, REJECT
 from QR_code_reader.modules import get_inf_from_bot
 
 
@@ -23,6 +23,12 @@ class MainWindow(QMainWindow):
         self.previous_qr_code = ""
         self.camera_on = False
         self.load_ui(UI_FILE)
+        font = QFont()
+        font.setPointSize(16)
+        self.status.setFont(font)
+        font.setPointSize(32)
+        self.status_2.setFont(font)
+        self.about.setFont(font)
 
         self.reset_status()
         self.start_camera()
@@ -73,16 +79,10 @@ class MainWindow(QMainWindow):
 
         student_id, code = words
         res = get_inf_from_bot(code, student_id)
-        print(res["ok"])
         if res["ok"]:
-            print(res["status"])
-            print(res["image"])
-            # img = Image.fromarray(array(loads(res["image"]), dtype='uint8'))
-            # qim = ImageQt(img)
             qim = QImage.fromData(base64.b64decode(res["image"]))
             pix = QPixmap.fromImage(qim)
-            ans = str(res["status"]), res["name"] + "   " + res["grade"], pix
-            print(ans[:-1])
+            ans = str(res["status"]), '\n'.join(res["name"].split()) + "\n" + res["grade"], pix
             return ans
         else:
             self.reset_status()
@@ -104,6 +104,11 @@ class MainWindow(QMainWindow):
     def update_status(self, status, name, photo):
         self.about.setText(name)
         self.status_2.setText(status)
+        print(type(status))
+        if status == "True":
+            self.status_2.setPixmap(QPixmap(ACCEPT).scaled(300, 300))
+        else:
+            self.status_2.setPixmap(QPixmap(REJECT).scaled(300, 300))
         self.set_new_photo(photo)
 
     def reset_status(self):

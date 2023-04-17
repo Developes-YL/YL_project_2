@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1001</width>
+    <width>1171</width>
     <height>707</height>
    </rect>
   </property>
@@ -23,21 +23,27 @@
    <widget class="QLabel" name="about">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>80</y>
-      <width>281</width>
-      <height>371</height>
+      <x>550</x>
+      <y>30</y>
+      <width>561</width>
+      <height>271</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="status">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>620</y>
+      <y>630</y>
       <width>271</width>
       <height>71</height>
      </rect>
@@ -45,18 +51,24 @@
     <property name="text">
      <string>TextLabel</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="status_2">
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>530</y>
-      <width>271</width>
-      <height>121</height>
+      <y>350</y>
+      <width>300</width>
+      <height>300</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QGraphicsView" name="graphicsView">

@@ -37,14 +37,17 @@ def is_user_in_db(tg_id: int) -> bool:
     return len(res) != 0
 
 
-def get_code(tg_id: str) -> str:
-    for_lunch = False
+def get_code(tg_id: int, for_lunch: bool) -> str:
     conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
     cur = conn.cursor()  # создание курсора
-    st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()[0]
-    cur.execute(f'SELECT {"lunch" if for_lunch else "breakfast"} FROM Codes WHERE id = {st_id}')
+    st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()
+    if len(st_id) == 0:
+        return "error"
+    cur.execute(f'SELECT {"lunch" if for_lunch else "breakfast"} FROM Codes WHERE id = {st_id[0]}')
     code = cur.fetchone()  # получение результата
     conn.close()  # закрытие соединения с базой данных
+    if not code or len(code) == 0:
+        return "error"
     return code[0] if code[0] != '0' else 'error'
 
 

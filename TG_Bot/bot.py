@@ -4,7 +4,7 @@ from telebot import types
 from telebot.types import Message
 import tempfile
 
-from TG_Bot import payment, registration
+from TG_Bot import payment, registration, TIME_START, TIME_CHANGE, TIME_STOP
 from TG_Bot.modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
 from TG_Bot.modules import setup_time_func
 from TG_Bot.registration import handle_name
@@ -56,16 +56,15 @@ def lunch_choise(message):
 
 def lunch_choise1(message):
     if message.text.strip() == 'Завтрак':
-        if check_time_in_interval('07:25', '9:50'):
-            qr_generation(message)
+        print(TIME_START, TIME_CHANGE, check_time_in_interval(TIME_START, TIME_CHANGE))
+        if check_time_in_interval(TIME_START, TIME_CHANGE):
+            qr_generation(message, False)
         else:
             bot.send_message(message.chat.id, 'Сейчас не время для завтрака!')
             start(message, False)
     elif message.text.strip() == 'Обед':
-        if check_time_in_interval('12:25', '12:50'):
-            qr_generation(message)
-        elif check_time_in_interval('13:30', '13:55'):
-            qr_generation(message)
+        if check_time_in_interval(TIME_CHANGE, TIME_STOP):
+            qr_generation(message, True)
         else:
             bot.send_message(message.chat.id, 'Сейчас не время для обеда!')
             start(message, False)
@@ -74,9 +73,14 @@ def lunch_choise1(message):
         lunch_choise(message)
 
 
-def qr_generation(message):
+def qr_generation(message, for_lunch: bool):
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(str(message.chat.id) + ' ' + get_code(message.chat.id))
+    code = get_code(message.chat.id, for_lunch)
+    if code == "error":
+        bot.send_message(message.chat.id, 'Ошибка!')
+        start(message, False)
+        return
+    qr.add_data(str(message.chat.id) + ' ' + code)
     qr.make(fit=True)
     img = qr.make_image(fill_color='black', back_color='white')
     with tempfile.NamedTemporaryFile(delete=False) as temp:

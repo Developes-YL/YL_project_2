@@ -4,7 +4,7 @@ price_next_month_breakfast=122
 price_next_month_lunch=229
 time_start=8:00
 time_change=11:00
-time_stop=15:00
+time_stop=18:00
 time_generation=6:00
 class_numbers:8;9;10;11
 class_letters:М;Н;О;П;Р;С
