@@ -7,16 +7,18 @@ import string
 import threading
 import time
 
+from TG_Bot import DB, SETTINGS
+
 
 def setup_time_func():
-    timer1 = threading.Thread(target=a)
+    timer1 = threading.Thread(target=set_month_timer)
     timer1.start()
-    timer2 = threading.Thread(target=b)
+    timer2 = threading.Thread(target=set_day_timer)
     timer2.start()
     print("таймеры запущены")
 
 
-def a():
+def set_month_timer():
     now = datetime.datetime.now()
     time_start = (calendar.monthrange(now.year, now.month)[1] - now.today().day) * 24 * 3600 + \
                  ((24 - now.time().hour) * 60 - now.time().minute) * 60 - now.time().second + 60
@@ -25,9 +27,9 @@ def a():
     scheduler.run()
 
 
-def b():
+def set_day_timer():
     now = datetime.datetime.now()
-    with open('../DB/settings.txt', 'r') as file:
+    with open(SETTINGS, 'r') as file:
         for i in range(7):
             file.readline()
         line = file.readline().split("=")[1].rstrip()
@@ -40,7 +42,7 @@ def b():
 
 
 def change_month():
-    con = sqlite3.connect("../DB/MainDB.db")
+    con = sqlite3.connect(DB)
     cur = con.cursor()
     cur.execute("DELETE FROM Lunch_this")
     lunches = cur.execute("SELECT * FROM lunch_next").fetchall()
@@ -60,12 +62,12 @@ def change_month():
     cur.execute("DELETE FROM Request")
     con.commit()
     con.close()
-    a()
+    set_month_timer()
 
 
 def change_day():
     today = datetime.datetime.now().today().day
-    con = sqlite3.connect("../DB/MainDB.db")
+    con = sqlite3.connect(DB)
     cur = con.cursor()
     cur.execute("DELETE FROM Codes")
     lunches = cur.execute(f"SELECT id FROM Lunch_this WHERE _{today} = '+'").fetchall()
@@ -80,7 +82,7 @@ def change_day():
         cur.execute(f"INSERT INTO Codes VALUES ({i[0]}, '{lunch}', '{breakfast}')")
     con.commit()
     con.close()
-    b()
+    set_day_timer()
 
 
 def generate_code() -> str:
@@ -90,5 +92,6 @@ def generate_code() -> str:
 
 
 if __name__ == "__main__":
-    #change_month()
-    change_day()
+    # change_month()
+    # change_day()
+    pass

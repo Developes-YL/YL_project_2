@@ -1,16 +1,11 @@
 import base64
 import datetime
 import sqlite3
-from json import dumps
-
-from PIL import Image
-from numpy import array
 
 from WebAPI import TIME_CHANGE, DB, CODE_FILE, PHOTOS_DIR
 
 
 def get_inf(student_id: int, student_code: str) -> dict:
-    print(student_id, student_code)
     ans = list()
     res = get_status(student_id, student_code)
     if res == "error":
@@ -18,14 +13,11 @@ def get_inf(student_id: int, student_code: str) -> dict:
     ans.append(res)
     res = load_inf_from_dp(student_id)
     if res == "error":
-        print(res)
         return "error"
     ans.extend(res)
     image = get_photo_from_db(student_id)
     if image == "error":
-        print(image + "!")
         return "error"
-    #ans.append(dumps(array(image).tolist()))
     ans.append(image)
     return ans
 
@@ -33,10 +25,8 @@ def get_inf(student_id: int, student_code: str) -> dict:
 def load_inf_from_dp(student_id: int):
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    print(student_id)
     que = f'SELECT surname, name, patronymic, grade_number, grade_letter FROM Students WHERE tg_id = {student_id}'
     result = cur.execute(que).fetchone()
-    print(result)
     if not result:
         return "error"
     result = list(map(str, result))
@@ -53,18 +43,16 @@ def get_status(student_id: int, code: str) -> bool:
         lunch_or_breafast = "lunch"
     else:
         lunch_or_breafast = "breakfast"
-    print(lunch_or_breafast, time_now, time_change)
     con = sqlite3.connect(DB)
     cur = con.cursor()
-    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (student_id,)).fetchone()
-    if not id or len(id) == 0:
+    id_in_db = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (student_id,)).fetchone()
+    if not id_in_db or len(id_in_db) == 0:
         return "error"
-    id = id[0]
-    que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {id}'
+    id_in_db = id_in_db[0]
+    que = f'SELECT {lunch_or_breafast} FROM Codes WHERE id = {id_in_db}'
     result = cur.execute(que).fetchone()
-    cur.execute(f"UPDATE Codes SET {lunch_or_breafast} = '0' WHERE id = {id}")
+    cur.execute(f"UPDATE Codes SET {lunch_or_breafast} = '0' WHERE id = {id_in_db}")
     if len(result) == 0:
-        print("error!!")
         return "error"
     if result[0] == "0":
         return False

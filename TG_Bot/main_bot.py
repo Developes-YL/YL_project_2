@@ -4,11 +4,11 @@ from telebot import types
 from telebot.types import Message
 import tempfile
 
-from TG_Bot import payment, registration, TIME_START, TIME_CHANGE, TIME_STOP
+from TG_Bot import modules_payment, modules_registration, TIME_START, TIME_CHANGE, TIME_STOP
 from TG_Bot.modules_for_db import is_user_in_db, get_name_from_db, get_code, check_time_in_interval
-from TG_Bot.modules import setup_time_func
-from TG_Bot.registration import handle_name
-from TG_Bot.payment import choice_day
+from TG_Bot.modules_timers import setup_time_func
+from TG_Bot.modules_registration import handle_name
+from TG_Bot.modules_payment import choice_day
 
 with open("Support/TOKEN.txt", 'r') as file:
     token = file.readline()
@@ -56,7 +56,6 @@ def lunch_choise(message):
 
 def lunch_choise1(message):
     if message.text.strip() == 'Завтрак':
-        print(TIME_START, TIME_CHANGE, check_time_in_interval(TIME_START, TIME_CHANGE))
         if check_time_in_interval(TIME_START, TIME_CHANGE):
             qr_generation(message, False)
         else:

@@ -1,16 +1,11 @@
 import base64
 import sys
-from json import loads
-
-from PIL import Image
-from PIL.ImageQt import ImageQt
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QPixmap, QImage, QFont
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
-from numpy import array
 from pyzbar import pyzbar
 
 from QR_code_reader import UI_FILE, ACCEPT, REJECT
@@ -104,7 +99,6 @@ class MainWindow(QMainWindow):
     def update_status(self, status, name, photo):
         self.about.setText(name)
         self.status_2.setText(status)
-        print(type(status))
         if status == "True":
             self.status_2.setPixmap(QPixmap(ACCEPT).scaled(300, 300))
         else:

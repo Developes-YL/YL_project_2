@@ -1,13 +1,11 @@
 import os
-
 from telebot import TeleBot
 from telebot.types import Message
 
 from TG_Bot.modules_for_db import add_inf_to_db, get_classes
 
-
 bot: TeleBot = None
-start = None
+start = lambda x: x
 
 
 def set_bot(new_bot: TeleBot, func):

@@ -2,6 +2,7 @@ import sqlite3
 import requests
 from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
+from DB_updater import DB
 from Support.mainW import MainW
 
 
@@ -16,7 +17,7 @@ class MyWindow(MainW):
         self.pushButton.clicked.connect(self.accept)
 
     def load(self):
-        con = sqlite3.connect("../DB/MainDB.db")
+        con = sqlite3.connect(DB)
         cur = con.cursor()
         que = """SELECT Students.id, Students.surname, Students.name, 
                 Students.patronymic, Students.grade_number, Students.grade_letter, Request.number, 
@@ -34,6 +35,7 @@ class MyWindow(MainW):
         self.tableWidget.setColumnCount(5)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.titles = ["N", "ФИО", "Класс", "Номер перевода", "Сумма"]
+        self.tableWidget.setHorizontalHeaderLabels(self.titles)
         for i, row in enumerate(inf):
             for j, elem in enumerate(row):
                 self.tableWidget.setItem(i, j, QTableWidgetItem(str(elem)))
@@ -55,7 +57,7 @@ class MyWindow(MainW):
         self.updateTable(lst)
 
     def accept(self):
-        con = sqlite3.connect("../DB/MainDB.db")
+        con = sqlite3.connect(DB)
         cur = con.cursor()
         que = """DELETE FROM Request WHERE id = ?"""
         indexes_l = list(map(lambda x: x[0], cur.execute("SELECT id FROM lunch_next").fetchall()))
@@ -65,12 +67,13 @@ class MyWindow(MainW):
             if elem[0] in map(lambda x: x[0], self.rejected):
                 with open("../TG_Bot/Support/TOKEN.txt") as file:
                     token = file.readline().rstrip()
-                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}&text=!!Ваша оплата некорректна!!")
+                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}"
+                             f"&text=!!Ваша оплата некорректна!!")
             else:
                 with open("../TG_Bot/Support/TOKEN.txt") as file:
                     token = file.readline().rstrip()
-                print(token)
-                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}&text=Ваша оплата принята")
+                requests.get(f"https://api.telegram.org/bot{token}/sendMessage?chat_id={tg_id}"
+                             f"&text=Ваша оплата принята")
                 res = cur.execute("""SELECT days_l, days_b FROM 
                             Request WHERE id = ?""", (elem[0],)).fetchall()
                 if not res:
@@ -88,7 +91,6 @@ class MyWindow(MainW):
                     days_b = [days_b]
                 else:
                     days_b = []
-                print(days_b, days_l)
                 days = range(1, 32)
                 lst = []
                 for n, day in enumerate(days):

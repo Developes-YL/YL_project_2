@@ -3,8 +3,8 @@ import sqlite3
 from PyQt5.QtWidgets import QDialog
 from PyQt5 import uic
 
-from DB_updater import change_window
-from mainwindow import MyWindow
+from DB_updater import change_window, DB
+from main_window import MyWindow
 
 
 class MyWindow2(QDialog):
@@ -17,7 +17,7 @@ class MyWindow2(QDialog):
         login = self.login.text()
         password = self.password.text()
         self.password.setText("")
-        con = sqlite3.connect("../DB/MainDB.db")
+        con = sqlite3.connect(DB)
         cur = con.cursor()
         res = cur.execute(f"SELECT password FROM Admins WHERE login = '{login}'").fetchone()
         con.close()

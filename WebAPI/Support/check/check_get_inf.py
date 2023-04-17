@@ -21,4 +21,3 @@ if res["ok"]:
     Image.fromarray(np.array(json.loads(res["image"]), dtype='uint8')).show()
 else:
     print("Error2", res["description"])
-

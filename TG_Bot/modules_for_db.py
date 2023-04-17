@@ -1,6 +1,8 @@
 import sqlite3
 import datetime
 
+from TG_Bot import DB, DAYS_NEXT, SETTINGS
+
 
 def check_time_in_interval(start_time_str, end_time_str):
     current_time = datetime.datetime.now().time()
@@ -16,7 +18,7 @@ def check_time_in_interval(start_time_str, end_time_str):
 
 
 def get_name_from_db(tg_id: str) -> list:
-    con = sqlite3.connect("../DB/MainDB.db")
+    con = sqlite3.connect(DB)
     cur = con.cursor()
     que = f"SELECT name, surname from Students WHERE tg_id = {tg_id}"
     res = cur.execute(que).fetchone()
@@ -29,7 +31,7 @@ def get_name_from_db(tg_id: str) -> list:
 
 
 def is_user_in_db(tg_id: int) -> bool:
-    con = sqlite3.connect("../DB/MainDB.db")
+    con = sqlite3.connect(DB)
     cur = con.cursor()
     que = f"SELECT tg_id from Students WHERE tg_id = {str(tg_id)}"
     res = cur.execute(que).fetchall()
@@ -38,7 +40,7 @@ def is_user_in_db(tg_id: int) -> bool:
 
 
 def get_code(tg_id: int, for_lunch: bool) -> str:
-    conn = sqlite3.connect('../DB/MainDB.db')  # установление соединения с базой данных
+    conn = sqlite3.connect(DB)  # установление соединения с базой данных
     cur = conn.cursor()  # создание курсора
     st_id = cur.execute(f"SELECT id FROM Students WHERE tg_id = {tg_id}").fetchone()
     if len(st_id) == 0:
@@ -52,7 +54,7 @@ def get_code(tg_id: int, for_lunch: bool) -> str:
 
 
 def add_inf_to_db(inf: dict):
-    con = sqlite3.connect("../DB/MainDB.db")
+    con = sqlite3.connect(DB)
     cur = con.cursor()
     que = "INSERT INTO Students (tg_id, surname, name, patronymic, grade_number, grade_letter) " \
           f"VALUES ({inf['tg_id']}, '" + inf['surname'] + "', '" + inf['name'] + \
@@ -63,7 +65,7 @@ def add_inf_to_db(inf: dict):
 
 
 def get_prices():
-    with open("../DB/settings.txt", "r") as file:
+    with open(SETTINGS, "r") as file:
         price_this_month_breakfast = float(file.readline().split('=')[1])
         price_this_month_lunch = float(file.readline().split('=')[1])
         price_next_month_breakfast = float(file.readline().split('=')[1])
@@ -72,7 +74,7 @@ def get_prices():
 
 
 def get_classes():
-    with open("../DB/settings.txt", "r", encoding="utf-8") as file:
+    with open(SETTINGS, "r", encoding="utf-8") as file:
         for i in range(8):
             file.readline()
         class_numbers = file.readline().strip().split(':')[1].split(';')
@@ -80,13 +82,12 @@ def get_classes():
     return [class_numbers, class_letters]
 
 
-def add_days_to_db(days: dict, tg_id: int, number: str, sum: int):
-    print(days, tg_id, number, sum)
-    con = sqlite3.connect("../DB/MainDB.db")
+def add_days_to_db(days: dict, tg_id: int, number: str, final_sum: int):
+    con = sqlite3.connect(DB)
     cur = con.cursor()
-    id = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (tg_id,)).fetchone()[0]
+    id_in_db = cur.execute("SELECT id FROM Students WHERE tg_id = ?", (tg_id,)).fetchone()[0]
     days_in_month = dict()
-    with open("../DB/days_next.txt") as file:
+    with open(DAYS_NEXT) as file:
         for day in ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]:
             d = file.readline().strip().split(':')[1].split(';')
             d.remove('')
@@ -101,15 +102,10 @@ def add_days_to_db(days: dict, tg_id: int, number: str, sum: int):
             for elem in days_in_month[day]:
                 breakfast.append(int(elem))
     indexes = cur.execute("SELECT id FROM Request").fetchall()
-    if (id,) in indexes:
-        cur.execute(f"DELETE FROM Request WHERE id = {id}")
+    if (id_in_db,) in indexes:
+        cur.execute(f"DELETE FROM Request WHERE id = {id_in_db}")
     lunch = ';'.join(map(str, lunch))
     breakfast = ';'.join(map(str, breakfast))
-    cur.execute(f"INSERT INTO Request VALUES {(id, number, sum, lunch, breakfast)}")
+    cur.execute(f"INSERT INTO Request VALUES {(id_in_db, number, final_sum, lunch, breakfast)}")
     con.commit()
     con.close()
-
-
-if __name__=="__main__":
-    add_days_to_db({'lunch': {'Понедельник', 'Среда', 'Вторник'}, 'breakfast': {'Понедельник', 'Среда', 'Вторник'}},
-                   5065958894, 123123, 4914)
