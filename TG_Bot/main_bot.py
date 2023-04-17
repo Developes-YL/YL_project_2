@@ -17,8 +17,8 @@ bot = TeleBot(token)
 
 
 def set_bot(new_bot: TeleBot):
-    registration.set_bot(new_bot, start)
-    payment.set_bot(new_bot, start)
+    modules_registration.set_bot(new_bot, start)
+    modules_payment.set_bot(new_bot, start)
 
 
 @bot.message_handler(commands=["start"])
