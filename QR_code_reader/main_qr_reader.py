@@ -1,11 +1,15 @@
+import base64
 import sys
-import cv2
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QPixmap, QImage, QFont
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from imutils import resize
 from imutils.video import VideoStream
 from pyzbar import pyzbar
+
+from QR_code_reader import UI_FILE, ACCEPT, REJECT
+from QR_code_reader.modules import get_inf_from_bot
 
 
 class MainWindow(QMainWindow):
@@ -13,12 +17,30 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.previous_qr_code = ""
         self.camera_on = False
-        self.load_ui('Support/main_window.ui')
+        self.load_ui(UI_FILE)
+        font = QFont()
+        font.setPointSize(16)
+        self.status.setFont(font)
+        font.setPointSize(32)
+        self.status_2.setFont(font)
+        self.about.setFont(font)
+
         self.reset_status()
         self.start_camera()
 
+    def set_new_photo(self, pixmap: QPixmap):
+        try:
+            w_old, h_old = pixmap.width(), pixmap.height()
+            w_max, h_max = self.image.width(), self.image.height()
+            k = max(w_old / w_max, h_old / h_max)
+            pixmap = pixmap.scaled(int(w_old / k), int(h_old / k))
+            self.image.setPixmap(pixmap)
+        except Exception as e:
+            print("image error", e.__class__.__name__)
+
     def load_ui(self, file_name: str):
         uic.loadUi(file_name, self)
+        self.showMaximized()
 
     def update(self, delta: int = 100):
         QTimer.singleShot(delta, self.update)
@@ -50,9 +72,17 @@ class MainWindow(QMainWindow):
         if len(words) != 2:
             return False
 
-        code, student_id = words
-        res = self.get_inf_from_bot(code, student_id)
-        return res
+        student_id, code = words
+        res = get_inf_from_bot(code, student_id)
+        if res["ok"]:
+            qim = QImage.fromData(base64.b64decode(res["image"]))
+            pix = QPixmap.fromImage(qim)
+            ans = str(res["status"]), '\n'.join(res["name"].split()) + "\n" + res["grade"], pix
+            return ans
+        else:
+            self.reset_status()
+            self.status_2.setText(res["description"])
+            return []
 
     def start_camera(self):
         try:
@@ -66,17 +96,20 @@ class MainWindow(QMainWindow):
         self.camera_on = False
         self.vs.stop()
 
-    def get_inf_from_bot(self, code, student_id):
-        return ["0"] * 3
-
     def update_status(self, status, name, photo):
         self.about.setText(name)
-        self.status.setText(status)
+        self.status_2.setText(status)
+        if status == "True":
+            self.status_2.setPixmap(QPixmap(ACCEPT).scaled(300, 300))
+        else:
+            self.status_2.setPixmap(QPixmap(REJECT).scaled(300, 300))
+        self.set_new_photo(photo)
 
     def reset_status(self):
         self.about.setText("")
         self.status.setText("")
         self.status_2.setText("")
+        self.image.setPixmap(QPixmap())
 
     def get_text_from_qr(self):
         frame = self.vs.read()
